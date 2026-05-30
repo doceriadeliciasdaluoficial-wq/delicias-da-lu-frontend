@@ -173,25 +173,25 @@ export default function OrderBuilder({ setCurrentPage }) {
 
   return (
     <main className="overflow-x-hidden pt-20 md:pt-20">
-      <section className="min-h-screen py-16 px-6 md:px-20 bg-background">
+      <section className="min-h-screen py-14 md:py-16 px-4 sm:px-6 md:px-20 bg-background">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <span className="material-symbols-outlined text-6xl text-primary mb-4 block">cake</span>
-            <h1 className="font-display-lg text-display-lg text-on-background mb-4">Monte seu Bolo</h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant">
+            <span className="material-symbols-outlined text-5xl sm:text-6xl text-primary mb-4 block">cake</span>
+            <h1 className="font-display-lg text-[2.25rem] sm:text-display-lg text-on-background mb-4">Monte seu Bolo</h1>
+            <p className="font-body-lg text-[1rem] sm:text-body-lg text-on-surface-variant px-2 sm:px-0">
               Customize seu bolo em {steps.length} passos fáceis!
             </p>
           </div>
 
           {/* Progress Steps */}
-          <div className="flex justify-between mb-12 gap-2 flex-wrap">
+          <div className="flex gap-2 mb-10 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-between">
             {steps.map((s, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setStep(i)}
-                className="flex-1 min-w-[110px] flex flex-col items-center"
+                className="flex-shrink-0 w-24 sm:w-28 flex flex-col items-center"
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${
@@ -211,14 +211,14 @@ export default function OrderBuilder({ setCurrentPage }) {
             {/* Main Content */}
             <div className="lg:col-span-2">
               {/* Current Step Content */}
-              <div className="bg-surface-container-lowest p-8 rounded-lg border border-outline-variant mb-8">
+              <div className="bg-surface-container-lowest p-5 sm:p-8 rounded-lg border border-outline-variant mb-8">
                 <h2 className="font-headline-lg text-headline-lg text-primary mb-6">{steps[step]}</h2>
 
                 {step === 5 ? (
                   <div className="space-y-4 mb-8">
                     <div className="rounded-xl border border-outline-variant bg-surface-container/30 p-5">
                       <h3 className="font-headline-md text-headline-md text-on-surface mb-4">Resumo do pedido</h3>
-                      <div className="grid gap-4 md:grid-cols-3">
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {summaryGroups.map((group) => (
                           <div key={group.title} className="rounded-lg border border-outline-variant bg-surface p-4">
                             <p className="font-label-md text-label-md text-primary mb-3">{group.title}</p>
@@ -236,21 +236,21 @@ export default function OrderBuilder({ setCurrentPage }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4 mb-8">
+                  <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4 mb-8">
                     {currentOption.map(option => (
                       <button
                         key={option.id}
                         onClick={() => handleSelect(option.id)}
-                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                        className={`w-full p-3 sm:p-4 rounded-lg border-2 transition-all text-left ${
                           selectedValue === option.id
                             ? 'border-primary bg-primary/10'
                             : 'border-outline-variant bg-surface hover:border-primary/50'
                         }`}
                       >
-                        <div className="flex gap-4 items-start">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 items-start">
                           {/* Image */}
                           {option.image && (
-                            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container">
+                            <div className="w-full h-24 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container">
                               <img 
                                 src={option.image} 
                                 alt={option.label}
@@ -264,21 +264,21 @@ export default function OrderBuilder({ setCurrentPage }) {
 
                           {/* Content */}
                           <div className="flex-1">
-                            <p className="font-headline-md text-headline-md text-on-surface">{option.label}</p>
-                            <p className="font-body-md text-body-md text-on-surface-variant mt-1">{option.description}</p>
+                            <p className="font-headline-md text-[0.95rem] sm:text-headline-md text-on-surface leading-tight">{option.label}</p>
+                            <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mt-1 line-clamp-2">{option.description}</p>
                             
                             {/* Weight/Servings info for sizes */}
                             {step === 4 && option.weight && (
-                              <div className="flex gap-4 mt-2 text-body-sm text-on-surface-variant">
+                              <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-2 text-body-sm text-on-surface-variant">
                                 <span>📏 {option.weight}</span>
                                 <span>👥 {option.servings}</span>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex-shrink-0 text-right">
+                          <div className="flex-shrink-0 text-right sm:ml-auto w-full sm:w-auto mt-1 sm:mt-0">
                             {step !== 4 && (
-                              <span className={`font-label-md text-label-md font-bold ${selectedValue === option.id ? 'text-primary' : 'text-on-surface-variant'}`}>
+                              <span className={`font-label-md text-[0.8rem] sm:text-label-md font-bold ${selectedValue === option.id ? 'text-primary' : 'text-on-surface-variant'}`}>
                                 +{formatPrice(option.value, false)}
                               </span>
                             )}
@@ -382,16 +382,18 @@ export default function OrderBuilder({ setCurrentPage }) {
 
                 {/* Navigation Buttons */}
                 {step < 5 && (
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <SecondaryButton
                       onClick={handlePrev}
                       disabled={step === 0}
+                      className="w-full sm:flex-1"
                     >
                       ← Anterior
                     </SecondaryButton>
                     <PrimaryButton
                       onClick={handleNext}
                       disabled={!selectedValue && !(step === 4 && customKg && customKg > 0)}
+                      className="w-full sm:flex-1"
                     >
                       Próximo →
                     </PrimaryButton>
@@ -403,7 +405,7 @@ export default function OrderBuilder({ setCurrentPage }) {
             {/* Right Sidebar - Summary */}
             <div className="lg:col-span-1">
               {/* Price Preview Card */}
-              <div className="bg-gradient-to-br from-tertiary/20 to-tertiary/10 p-6 rounded-lg border-2 border-tertiary sticky top-32">
+              <div className="bg-gradient-to-br from-tertiary/20 to-tertiary/10 p-5 sm:p-6 rounded-lg border-2 border-tertiary lg:sticky lg:top-32">
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-6 pb-4 border-b border-tertiary">
                   {step === 5 ? '✅ Pedido pronto' : '📋 Seu Bolo'}
                 </h3>
@@ -496,10 +498,10 @@ export default function OrderBuilder({ setCurrentPage }) {
 
                 {/* Action Buttons - Only on final step */}
                 {step === 5 && (
-                  <div className={actionButtonContainer}>
+                  <div className={`${actionButtonContainer} flex-col sm:flex-row`}>
                     <PrimaryButton
                       onClick={handleAddToCart}
-                      className="flex items-center justify-center gap-2"
+                      className="flex items-center justify-center gap-2 w-full"
                     >
                       <span className="material-symbols-outlined text-[20px] leading-none">shopping_cart</span>
                       Carrinho
@@ -508,6 +510,7 @@ export default function OrderBuilder({ setCurrentPage }) {
                       onClick={() => {
                         window.open(CONTACTS.whatsapp.link + '?text=' + encodeURIComponent(buildWhatsAppMessage()), '_blank')
                       }}
+                      className="w-full"
                     >
                       <span className="material-symbols-outlined text-[20px] leading-none">chat</span>
                       Falar com Lú

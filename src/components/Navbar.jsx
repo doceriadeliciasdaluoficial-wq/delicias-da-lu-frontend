@@ -48,7 +48,7 @@ export default function Navbar({ setCurrentPage, currentPage }) {
       </nav>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 w-full z-40 bg-surface/90 backdrop-blur-md flex justify-between items-center h-16 px-6 shadow-sm border-b border-outline-variant">
+      <div className="md:hidden fixed top-0 w-full z-40 bg-surface/90 backdrop-blur-md flex justify-between items-center h-16 px-4 shadow-sm border-b border-outline-variant">
         <button
           onClick={() => handleNavClick('home')}
           className="flex items-center hover:opacity-80 transition-opacity"
@@ -56,7 +56,7 @@ export default function Navbar({ setCurrentPage, currentPage }) {
           <img src="/logo.png" alt="Logo Delícias da Lú" className="h-12 w-12" />
         </button>
         <button
-          className="text-on-surface"
+          className="text-on-surface p-2 -mr-2"
           onClick={() => setIsMenuOpen(true)}
           aria-label="Abrir menu"
         >
@@ -66,18 +66,18 @@ export default function Navbar({ setCurrentPage, currentPage }) {
 
       {/* Mobile Sidebar Menu */}
       <div
-        className={`md:hidden fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-container w-72 shadow-xl transform transition-transform duration-300 ${
+        className={`md:hidden fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-container w-full max-w-sm shadow-xl transform transition-transform duration-300 ${
           isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         id="mobile-menu"
       >
-        <div className="p-6 flex justify-between items-center border-b border-outline-variant">
+        <div className="p-5 flex justify-between items-center border-b border-outline-variant">
           <div className="flex flex-col gap-2">
             <img src="/logo.png" alt="Logo Delícias da Lú" className="h-14 w-14" />
             <span className="font-body-md text-body-md text-secondary">Padaria Artesanal</span>
           </div>
           <button
-            className="text-on-surface"
+            className="text-on-surface p-2 -mr-2"
             onClick={() => setIsMenuOpen(false)}
             aria-label="Fechar menu"
           >
@@ -85,12 +85,12 @@ export default function Navbar({ setCurrentPage, currentPage }) {
           </button>
         </div>
 
-        <nav className="flex flex-col gap-2 mt-4 overflow-y-auto px-2 flex-1">
+        <nav className="flex flex-col gap-2 mt-4 overflow-y-auto px-2 flex-1 pb-4">
           {navigationItems.map((item) => (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className={`flex items-center gap-4 px-4 py-3 font-label-md text-label-md transition-colors duration-200 text-left rounded-lg mx-2 my-1 ${
+              className={`flex items-center gap-4 px-4 py-3.5 font-label-md text-label-md transition-colors duration-200 text-left rounded-lg mx-2 my-1 min-h-12 ${
                 currentPage === item.id
                   ? 'bg-primary/20 text-primary'
                   : 'text-on-surface-variant hover:bg-surface-container-highest'
@@ -108,8 +108,8 @@ export default function Navbar({ setCurrentPage, currentPage }) {
           ))}
         </nav>
 
-        <div className="p-6 border-t border-outline-variant">
-          <button className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(214,42,42,0.15)] flex justify-center items-center gap-2 hover:bg-primary-light transition-all duration-200">
+        <div className="p-5 border-t border-outline-variant">
+          <button className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(214,42,42,0.15)] flex justify-center items-center gap-2 hover:bg-primary-light transition-all duration-200 min-h-12">
             <span className="material-symbols-outlined">chat</span>
             Fazer Pedido
           </button>

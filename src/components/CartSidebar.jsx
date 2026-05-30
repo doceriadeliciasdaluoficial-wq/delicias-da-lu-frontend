@@ -148,13 +148,13 @@ export default function CartSidebar() {
       {/* Cart Button - Fixed Top Right */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed right-6 top-24 z-40 flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 ${
+        className={`fixed right-3 top-32 md:right-6 md:top-24 z-40 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 ${
           animating ? 'animate-pulse scale-125' : ''
         }`}
         title="Abrir carrinho"
       >
         <div className="relative">
-          <span className="material-symbols-outlined text-2xl">shopping_bag</span>
+          <span className="material-symbols-outlined text-lg md:text-2xl">shopping_bag</span>
           {cartItems.length > 0 && (
             <span className="absolute -top-2 -right-2 w-5 h-5 bg-tertiary text-on-tertiary text-xs font-bold rounded-full flex items-center justify-center">
               {cartItems.length}
@@ -173,13 +173,13 @@ export default function CartSidebar() {
 
       {/* Cart Sidebar - Drawer from Right */}
       <div
-        className={`fixed right-0 top-0 h-screen w-96 bg-surface z-50 shadow-2xl transform transition-transform duration-300 flex flex-col ${
+        className={`fixed right-0 top-0 h-[100dvh] w-full sm:w-96 bg-surface z-50 shadow-2xl transform transition-transform duration-300 flex flex-col ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="px-6 py-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
-          <h2 className="font-headline-md text-headline-md text-on-background flex items-center gap-2">
+        <div className="px-4 sm:px-6 py-5 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+          <h2 className="font-headline-md text-headline-md text-on-background flex items-center gap-2 min-w-0">
             <span className="material-symbols-outlined">shopping_bag</span>
             Meu Carrinho
           </h2>
@@ -192,7 +192,7 @@ export default function CartSidebar() {
         </div>
 
         {/* Items List */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-3 opacity-50">
@@ -294,7 +294,7 @@ export default function CartSidebar() {
 
         {/* Footer */}
         {cartItems.length > 0 && (
-          <div className="border-t border-outline-variant px-6 py-4 space-y-4 bg-surface-container-lowest">
+          <div className="border-t border-outline-variant px-4 sm:px-6 py-4 space-y-4 bg-surface-container-lowest">
             <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
               <p className="font-label-md text-label-md text-on-surface-variant mb-1">Total do Pedido</p>
               <p className="font-display-sm text-headline-md text-primary font-bold">
@@ -306,7 +306,7 @@ export default function CartSidebar() {
               href={`${CONTACTS.whatsapp.link}?text=${encodeURIComponent(buildWhatsAppMessage())}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors shadow-md block text-center cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors shadow-md block text-center cursor-pointer flex items-center justify-center gap-2 min-h-12"
             >
               <span className="material-symbols-outlined text-lg">send</span>
               Finalizar Pedido
@@ -314,7 +314,7 @@ export default function CartSidebar() {
 
             <button
               onClick={generatePDF}
-              className="w-full py-2 bg-surface-container-highest text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-highest/80 transition-colors border border-outline-variant text-sm flex items-center justify-center gap-2"
+              className="w-full py-2 bg-surface-container-highest text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-highest/80 transition-colors border border-outline-variant text-sm flex items-center justify-center gap-2 min-h-11"
               title="Gerar PDF com orçamento"
             >
               <span className="material-symbols-outlined text-base">download</span>
@@ -323,7 +323,7 @@ export default function CartSidebar() {
 
             <button
               onClick={clearCart}
-              className="w-full py-2 bg-error/10 text-error font-label-md text-label-md rounded-lg hover:bg-error/20 transition-colors border border-error/20"
+              className="w-full py-2 bg-error/10 text-error font-label-md text-label-md rounded-lg hover:bg-error/20 transition-colors border border-error/20 min-h-11"
             >
               Limpar Carrinho
             </button>

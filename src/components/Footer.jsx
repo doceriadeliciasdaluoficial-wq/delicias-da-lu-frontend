@@ -7,8 +7,8 @@ export default function Footer() {
   return (
     <footer className="bg-surface border-t border-outline-variant mt-16">
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 md:px-20 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-20 py-14 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12 mb-12">
           {/* Brand */}
           <div>
             <h3 className="font-headline-md text-headline-md text-on-background mb-4">
@@ -96,13 +96,13 @@ export default function Footer() {
             <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
               Receba notícias e promoções exclusivas
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
                 placeholder="Seu email"
-                className="flex-1 px-3 py-2 border border-outline-variant rounded-lg bg-background font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 px-3 py-2 border border-outline-variant rounded-lg bg-background font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary min-w-0"
               />
-              <button className="px-4 py-2 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors">
+              <button className="px-4 py-2 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors w-full sm:w-auto min-h-11">
                 <span className="material-symbols-outlined">send</span>
               </button>
             </div>
@@ -117,7 +117,7 @@ export default function Footer() {
           <p className="font-body-sm text-body-sm text-on-surface-variant text-center md:text-left">
             © 2024 Delícias da Lú. Todos os direitos reservados.
           </p>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap justify-center md:justify-end">
             <a
               href="https://www.instagram.com/deliciasda.lu.oficial/?hl=pt-br"
               target="_blank"

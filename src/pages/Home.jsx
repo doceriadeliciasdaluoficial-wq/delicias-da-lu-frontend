@@ -89,17 +89,17 @@ export default function Home({ setCurrentPage }) {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
         </div>
-        <div className="relative z-10 text-center px-6 md:px-20 flex flex-col items-center max-w-3xl mx-auto">
-          <h1 className="font-headline-lg md:font-display-lg text-display-lg text-white drop-shadow-lg mb-6 leading-tight">
+        <div className="relative z-10 text-center px-4 sm:px-6 md:px-20 flex flex-col items-center max-w-3xl mx-auto">
+          <h1 className="font-headline-lg md:font-display-lg text-[2.5rem] sm:text-[3.25rem] md:text-display-lg text-white drop-shadow-lg mb-6 leading-tight">
             Delícias da Lú
           </h1>
-          <p className="font-body-lg text-body-lg text-white/90 drop-shadow-md mb-10 max-w-xl mx-auto">
+          <p className="font-body-lg text-[1rem] sm:text-body-lg text-white/90 drop-shadow-md mb-10 max-w-xl mx-auto px-2 sm:px-0">
             Bolos artesanais feitos com amor, combinando ingredientes premium e design impecável para momentos inesquecíveis.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto">
             <button
               onClick={() => setCurrentPage('menu')}
-              className="px-8 py-4 bg-primary text-white font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.2)] hover:bg-surface-tint hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              className="px-8 py-4 bg-primary text-white font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.2)] hover:bg-surface-tint hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full sm:w-auto"
             >
               Ver Cardápio
             </button>
@@ -107,7 +107,7 @@ export default function Home({ setCurrentPage }) {
               href="https://wa.me/5511945754150?text=Oi Lú! Vim pelo site e quero fazer um pedido!"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 bg-white text-on-surface border border-outline-variant font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.1)] hover:bg-surface hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-white text-on-surface border border-outline-variant font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.1)] hover:bg-surface hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <span className="material-symbols-outlined text-primary">chat</span>
               WhatsApp
@@ -117,10 +117,10 @@ export default function Home({ setCurrentPage }) {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-24 px-6 md:px-20 bg-background">
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-20 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center mb-16 text-center">
-            <h2 className="font-headline-lg text-headline-lg text-on-background relative inline-block">
+          <div className="flex flex-col items-center mb-12 md:mb-16 text-center">
+            <h2 className="font-headline-lg text-[1.8rem] sm:text-headline-lg text-on-background relative inline-block">
               Destaques da Lú
               <span className="absolute -bottom-2 left-1/4 right-1/4 h-[2px] bg-tertiary rounded-full opacity-70"></span>
             </h2>
@@ -174,7 +174,7 @@ export default function Home({ setCurrentPage }) {
           </div>
 
           {/* Mobile Carousel */}
-          <div className="md:hidden relative">
+          <div className="md:hidden relative -mx-2 sm:mx-0">
             <div className="overflow-hidden rounded-xl">
               <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
                 {featuredCakes.map((cake, i) => (
@@ -255,9 +255,9 @@ export default function Home({ setCurrentPage }) {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-20 px-6 md:px-20 bg-primary text-white relative overflow-hidden">
+      <section className="py-16 md:py-20 px-4 sm:px-6 md:px-20 bg-primary text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-surface-container-lowest to-transparent pointer-events-none"></div>
-        <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
+        <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center px-2 sm:px-0">
           <span className="material-symbols-outlined text-[48px] mb-4 opacity-90">celebration</span>
           <h2 className="font-headline-lg md:font-display-lg text-headline-lg md:text-display-lg mb-6 leading-tight">
             Vai fazer uma festa?
@@ -265,10 +265,10 @@ export default function Home({ setCurrentPage }) {
           <p className="font-body-lg text-body-lg mb-10 text-primary-fixed max-w-2xl">
             Monte o bolo dos seus sonhos no nosso Cake Builder ou fale com a nossa equipe para criar algo totalmente personalizado para o seu evento.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <button
               onClick={() => setCurrentPage('order-builder')}
-              className="px-8 py-4 bg-white text-primary font-label-md text-label-md font-bold rounded-lg shadow-lg hover:shadow-2xl hover:bg-yellow-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              className="px-8 py-4 bg-white text-primary font-label-md text-label-md font-bold rounded-lg shadow-lg hover:shadow-2xl hover:bg-yellow-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full sm:w-auto"
             >
               🎂 Acessar Cake Builder
             </button>
@@ -276,7 +276,7 @@ export default function Home({ setCurrentPage }) {
               href="https://wa.me/5511945754150?text=Oi Lú! Gostaria de solicitar um orçamento para um bolo personalizado!"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 border-2 border-primary-fixed text-surface-container-lowest font-label-md text-label-md rounded-lg hover:bg-primary-fixed/20 hover:-translate-y-1 transition-all duration-300"
+              className="px-8 py-4 border-2 border-primary-fixed text-surface-container-lowest font-label-md text-label-md rounded-lg hover:bg-primary-fixed/20 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
             >
               Solicitar Orçamento
             </a>
@@ -285,7 +285,7 @@ export default function Home({ setCurrentPage }) {
       </section>
 
       {/* Instagram Section */}
-      <section className="py-24 px-6 md:px-20 bg-surface">
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-20 bg-surface">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center mb-12 text-center">
             <div className="flex items-center gap-2 mb-2">
@@ -302,11 +302,11 @@ export default function Home({ setCurrentPage }) {
             <iframe
               src="https://www.instagram.com/deliciasda.lu.oficial/embed"
               width="100%"
-              height="600"
+              height="520"
               frameBorder="0"
               scrolling="no"
               allowTransparency="true"
-              style={{ maxWidth: '540px', minWidth: '326px' }}
+              style={{ maxWidth: '540px', minWidth: '100%', width: '100%' }}
             ></iframe>
           </div>
 
