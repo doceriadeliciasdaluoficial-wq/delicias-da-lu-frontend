@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Instagram Embed Script -->
+    <script async src="//www.instagram.com/embed.js"></script>
+    
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#D62A2A",
+              "primary-light": "#E74C3C",
+              "tertiary": "#D4AF37",
+              "tertiary-light": "#F4D03F",
+              "yellow-400": "#FBBF24",
+              "secondary": "#8B4513",
+              "accent-red": "#DC143C",
+              "background": "#FFF8F6",
+              "surface": "#FFFBF7",
+              "surface-container": "#F5E6DC",
+              "surface-container-lowest": "#FFFFFF",
+              "on-background": "#3E1F0D",
+              "on-surface": "#3E1F0D",
+              "on-surface-variant": "#6B5344",
+              "on-tertiary": "#3E1F0D",
+              "outline-variant": "#D4C4B8",
+              "cream": "#FDF6EC",
+              "dark-brown": "#3E1F0D"
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px"
+            },
+            spacing: {
+              "margin-mobile": "20px",
+              "margin-desktop": "64px",
+              "container-max": "1200px",
+              "gutter": "24px",
+              "unit": "8px"
+            },
+            fontFamily: {
+              "label-md": ["Inter"],
+              "body-md": ["Inter"],
+              "display-lg": ["Playfair Display"],
+              "headline-lg-mobile": ["Playfair Display"],
+              "body-lg": ["Inter"],
+              "headline-md": ["Playfair Display"],
+              "headline-lg": ["Playfair Display"]
+            },
+            fontSize: {
+              "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+              "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "600" }],
+              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+              "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+              "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }]
+            }
+          }
+        }
+      }
+    </script>
+    
+    <title>Delícias da Lú - Bolos Artesanais</title>
+  </head>
+  <body class="bg-background text-on-background antialiased font-body-md overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
