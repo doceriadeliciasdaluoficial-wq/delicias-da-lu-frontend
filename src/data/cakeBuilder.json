@@ -1,0 +1,194 @@
+{
+  "sizes": [
+    {
+      "id": "1kg",
+      "label": "1 kg",
+      "value": 65,
+      "weight": "1000g",
+      "servings": "8-10 pessoas",
+      "description": "Perfeito para pequenos grupos",
+      "image": "/src/assets/cake-builder/sizes/1kg.jpg"
+    },
+    {
+      "id": "1.5kg",
+      "label": "1,5 kg",
+      "value": 95,
+      "weight": "1500g",
+      "servings": "12-15 pessoas",
+      "description": "Ideal para celebrações",
+      "image": "/src/assets/cake-builder/sizes/1.5kg.jpg"
+    },
+    {
+      "id": "2kg",
+      "label": "2 kg",
+      "value": 125,
+      "weight": "2000g",
+      "servings": "18-20 pessoas",
+      "description": "Para eventos maiores",
+      "image": "/src/assets/cake-builder/sizes/2kg.jpg"
+    },
+    {
+      "id": "3kg",
+      "label": "3 kg",
+      "value": 180,
+      "weight": "3000g",
+      "servings": "25-30 pessoas",
+      "description": "Ideal para festas grandes",
+      "image": "/src/assets/cake-builder/sizes/3kg.jpg"
+    }
+  ],
+  "masses": [
+    {
+      "id": "branca",
+      "label": "Branca",
+      "value": 0,
+      "description": "Massa clássica branca, leve e aerada",
+      "fullDescription": "Massa tradicional branca e macia, feita com ingredientes selecionados. Perfeita para complementar recheios frutados ou cremosos.",
+      "image": "/src/assets/cake-builder/massas/branca.jpg"
+    },
+    {
+      "id": "chocolate",
+      "label": "Chocolate",
+      "value": 5,
+      "description": "Massa de chocolate intenso",
+      "fullDescription": "Massa de chocolate feita com cacau de qualidade premium. Ideal para quem ama chocolate e busca um sabor mais intenso.",
+      "image": "/src/assets/cake-builder/massas/chocolate.jpg"
+    },
+    {
+      "id": "redvelvet",
+      "label": "Red Velvet",
+      "value": 10,
+      "description": "Massa vermelha elegante com baunilha",
+      "fullDescription": "Red Velvet é uma massa vermelha sofisticada com toque sutil de baunilha e um leve azedinho que vem do fermento azedo. Combinada com frosting branco, cria uma combinação clássica e elegante.",
+      "image": "/src/assets/cake-builder/massas/redvelvet.jpg"
+    }
+  ],
+  "fillings": [
+    {
+      "id": "frutas",
+      "label": "Frutas Diversas",
+      "value": 15,
+      "description": "Morango, framboesa, abacaxi",
+      "image": "/src/assets/cake-builder/recheios/frutas.jpg"
+    },
+    {
+      "id": "chocolate",
+      "label": "Chocolate",
+      "value": 10,
+      "description": "Chocolate derretido ou mousse",
+      "image": "/src/assets/cake-builder/recheios/chocolate.jpg"
+    },
+    {
+      "id": "ninho",
+      "label": "Ninho",
+      "value": 20,
+      "description": "Recheio cremoso de Ninho",
+      "image": "/src/assets/cake-builder/recheios/ninho.jpg"
+    },
+    {
+      "id": "docedeite",
+      "label": "Doce de Leite",
+      "value": 12,
+      "description": "Doce de leite premium",
+      "image": "/src/assets/cake-builder/recheios/docedeite.jpg"
+    },
+    {
+      "id": "brigadeiro",
+      "label": "Brigadeiro",
+      "value": 15,
+      "description": "Brigadeiro caseiro gourmet",
+      "image": "/src/assets/cake-builder/recheios/brigadeiro.jpg"
+    },
+    {
+      "id": "nutella",
+      "label": "Nutella",
+      "value": 18,
+      "description": "Nutella pura",
+      "image": "/src/assets/cake-builder/recheios/nutella.jpg"
+    },
+    {
+      "id": "maracuja",
+      "label": "Maracujá",
+      "value": 14,
+      "description": "Mousse de maracujá azedinha",
+      "image": "/src/assets/cake-builder/recheios/maracuja.jpg"
+    },
+    {
+      "id": "pavê",
+      "label": "Pavê",
+      "value": 12,
+      "description": "Pavê tradicional",
+      "image": "/src/assets/cake-builder/recheios/pave.jpg"
+    }
+  ],
+  "toppings": [
+    {
+      "id": "ganache",
+      "label": "Ganache",
+      "value": 10,
+      "description": "Cobertura de ganache brilhante",
+      "image": "/src/assets/cake-builder/coberturas/ganache.jpg"
+    },
+    {
+      "id": "calda",
+      "label": "Calda de Chocolate",
+      "value": 8,
+      "description": "Calda quente sobre o bolo",
+      "image": "/src/assets/cake-builder/coberturas/calda.jpg"
+    },
+    {
+      "id": "acucar",
+      "label": "Açúcar de Confeiteiro",
+      "value": 5,
+      "description": "Polvilho branco elegante",
+      "image": "/src/assets/cake-builder/coberturas/acucar.jpg"
+    },
+    {
+      "id": "sem",
+      "label": "Sem Cobertura",
+      "value": 0,
+      "description": "Apenas o recheio",
+      "image": "/src/assets/cake-builder/coberturas/sem.jpg"
+    }
+  ],
+  "decorations": [
+    {
+      "id": "frutas",
+      "label": "Frutas Frescas",
+      "value": 15,
+      "description": "Morangos, framboesas, etc. Variam com a sazonalidade",
+      "note": "As frutas variam de acordo com a estação do ano e disponibilidade no mercado.",
+      "image": "/src/assets/cake-builder/decoracoes/frutas.jpg"
+    },
+    {
+      "id": "raspas",
+      "label": "Raspas de Chocolate",
+      "value": 8,
+      "description": "Acabamento em raspas de chocolate",
+      "image": "/src/assets/cake-builder/decoracoes/raspas.jpg"
+    },
+    {
+      "id": "papelArroz",
+      "label": "Papel de Arroz",
+      "value": 5,
+      "description": "Decoração personalizada com desenhos",
+      "note": "Papel de Arroz pode ser pedido com outro fornecedor ou negociado diretamente conosco para trabalhos específicos.",
+      "image": "/src/assets/cake-builder/decoracoes/papel-arroz.jpg"
+    },
+    {
+      "id": "toppers",
+      "label": "Toppers Personalizados",
+      "value": 12,
+      "description": "Com nome, tema ou mensagem personalizada",
+      "note": "Toppers personalizados podem ser pedidos com outro fornecedor ou negociados diretamente conosco para criações especiais.",
+      "image": "/src/assets/cake-builder/decoracoes/topper.jpg"
+    },
+    {
+      "id": "vela",
+      "label": "Vela de Aniversário",
+      "value": 3,
+      "description": "Vela de aniversário",
+      "image": "/src/assets/cake-builder/decoracoes/vela.jpg"
+    }
+  ]
+}

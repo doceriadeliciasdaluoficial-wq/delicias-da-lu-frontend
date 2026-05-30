@@ -1,0 +1,391 @@
+{
+  "bolos": [
+    {
+      "id": "frutas-abacaxi-creme",
+      "name": "Abacaxi com creme",
+      "category": "🍓 Sabores de Frutas",
+      "price": 65,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/frutas-abacaxi-creme.jpg",
+      "description": "Bolo macio com camadas de abacaxi fresco e creme delicado. Perfeito para quem gosta de sabores leves e refrescantes. A fruta pode variar com a sazonalidade."
+    },
+    {
+      "id": "frutas-abacaxi-coco",
+      "name": "Abacaxi com coco",
+      "category": "🍓 Sabores de Frutas",
+      "price": 70,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/frutas-abacaxi-coco.jpg",
+      "description": "Combinação tropical de abacaxi com coco ralado, trazendo o sabor do verão em cada garfada. Leve e sofisticado, ideal para celebrações."
+    },
+    {
+      "id": "frutas-mousse-morango",
+      "name": "Mousse de Morango",
+      "category": "🍓 Sabores de Frutas",
+      "price": 68,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/frutas-mousse-morango.jpg",
+      "description": "Delicioso mousse com pedacinhos de morango fresco ou chocolate, leve e irresistível. A fruta pode ser substituída conforme disponibilidade da estação."
+    },
+    {
+      "id": "frutas-mousse-maracuja",
+      "name": "Mousse de Maracujá",
+      "category": "🍓 Sabores de Frutas",
+      "price": 65,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/frutas-mousse-maracuja.jpg",
+      "description": "Azedinha perfeita do maracujá em um mousse cremoso e sofisticado. Traz um toque especial e refrescante para qualquer ocasião."
+    },
+    {
+      "id": "chocolate-brigadeiro-simples",
+      "name": "Brigadeiro simples",
+      "category": "🍫 Sabores de Chocolate",
+      "price": 75,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/chocolate-brigadeiro-simples.jpg",
+      "description": "O clássico irresistível com ou sem morango fresco. Pura indulgência chocolate. Pode ser feito com recheio completo ou versão mais simples conforme preferência."
+    },
+    {
+      "id": "chocolate-brigadeiro-gourmet",
+      "name": "Brigadeiro gourmet",
+      "category": "🍫 Sabores de Chocolate",
+      "price": 80,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/chocolate-brigadeiro-gourmet.jpg",
+      "description": "Versão premium do brigadeiro com chocolate de qualidade superior e acabamento sofisticado. Ideal para eventos especiais que pedem elegância."
+    },
+    {
+      "id": "chocolate-mousse",
+      "name": "Mousse de chocolate",
+      "category": "🍫 Sabores de Chocolate",
+      "price": 85,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/chocolate-mousse.jpg",
+      "description": "Mousse aerado e cremoso que derrete na boca. O paraíso do chocolate em forma de bolo. Feito com chocolate de qualidade premium."
+    },
+    {
+      "id": "chocolate-mousse-nozes",
+      "name": "Mousse de chocolate com nozes",
+      "category": "🍫 Sabores de Chocolate",
+      "price": 95,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/chocolate-mousse-nozes.jpg",
+      "description": "Combinação perfeita entre o mousse cremoso e o crunch das nozes. Traz textura e sofisticação ao paladar."
+    },
+    {
+      "id": "ninho-brigadeiro",
+      "name": "Brigadeiro de ninho",
+      "category": "🥛 Sabores de Ninho",
+      "price": 70,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/ninho-brigadeiro.jpg",
+      "description": "Brigadeiro leve e cremoso feito com leite em pó integral. Sabor suave e apetitoso que agrada a todos os paladares."
+    },
+    {
+      "id": "ninho-brigadeiro-morango",
+      "name": "Brigadeiro de ninho com morango",
+      "category": "🥛 Sabores de Ninho",
+      "price": 75,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/ninho-brigadeiro-morango.jpg",
+      "description": "Brigadeiro de ninho complementado com pedaços frescos de morango. Uma combinação que traz equilíbrio entre cremosidade e frescor."
+    },
+    {
+      "id": "ninho-nutella",
+      "name": "Ninho com Nutella",
+      "category": "🥛 Sabores de Ninho",
+      "price": 98,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/ninho-nutella.jpg",
+      "description": "Combinação irresistível de Ninho com Nutella pura. Um clássico que nunca sai de moda. Perfeito para os amantes de avelã."
+    },
+    {
+      "id": "doceleite-simples",
+      "name": "Doce de leite",
+      "category": "🍯 Sabores de Doce de Leite",
+      "price": 70,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/doceleite-simples.jpg",
+      "description": "Doce de leite premium com ou sem coco ralado. Cremoso e delicioso, traz nostalgia e conforto em cada fatia."
+    },
+    {
+      "id": "doceleite-frutas",
+      "name": "Doce de leite com abacaxi ou ameixa",
+      "category": "🍯 Sabores de Doce de Leite",
+      "price": 75,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/doceleite-frutas.jpg",
+      "description": "Doce de leite complementado com frutas frescas (abacaxi ou ameixa). Combina a doçura do doce de leite com a frescor das frutas."
+    },
+    {
+      "id": "doceleite-nozes",
+      "name": "Doce de leite com nozes",
+      "category": "🍯 Sabores de Doce de Leite",
+      "price": 85,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/doceleite-nozes.jpg",
+      "description": "Doce de leite cremoso com textura crocante de nozes. Uma sofisticação que agrada ao palato dos mais exigentes."
+    },
+    {
+      "id": "trufado-chocolate",
+      "name": "Trufado de chocolate",
+      "category": "🍬 Trufados e Especiais",
+      "price": 95,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/trufado-chocolate.jpg",
+      "description": "Bolo de chocolate intenso com camadas trufadas (ao leite ou meio amargo). Ideal para ocasiões especiais e para amantes de chocolate sério."
+    },
+    {
+      "id": "trufado-branco",
+      "name": "Trufado de chocolate branco",
+      "category": "🍬 Trufados e Especiais",
+      "price": 100,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/trufado-branco.jpg",
+      "description": "Elegância em forma de bolo. Chocolate branco em camadas sofisticadas. Perfeito para quem aprecia doçura refinada."
+    },
+    {
+      "id": "prestigio",
+      "name": "Prestígio",
+      "category": "🍬 Trufados e Especiais",
+      "price": 70,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/prestigio.jpg",
+      "description": "Combinação icônica de chocolate e coco. Um clássico que nunca decepciona. Fresco e delicioso."
+    },
+    {
+      "id": "floresta-negra",
+      "name": "Floresta Negra",
+      "category": "🍬 Trufados e Especiais",
+      "price": 75,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/floresta-negra.jpg",
+      "description": "Clássico alemão com chocolate, cereja e chantilly. Sofisticado e sempre elegante. Ideal para celebrações especiais."
+    },
+    {
+      "id": "nozes-camafeu",
+      "name": "Nozes (Camafeu)",
+      "category": "🍬 Trufados e Especiais",
+      "price": 95,
+      "unit": "kg",
+      "image": "/src/assets/products/bolos/nozes-camafeu.jpg",
+      "description": "Massa com nozes caramelizadas em um acabamento sofisticado. Textura e sabor únicos que impressionam."
+    },
+    {
+      "id": "redvelvet",
+      "name": "Massa Red Velvet",
+      "category": "🍬 Trufados e Especiais",
+      "price": 0,
+      "unit": "valor-a-combinar",
+      "image": "/src/assets/products/bolos/redvelvet.jpg",
+      "description": "Massa vermelha elegante com toque de baunilha e fermento azedo. Acabamento sofisticado com frosting branco. Valor personalizado conforme customização."
+    }
+  ],
+  "docesSimples": [
+    {
+      "id": "simples-festa-brigadeiro",
+      "name": "Brigadeiro - Tamanho Festa",
+      "category": "Tamanho Festa (forminha nº6)",
+      "price": 85,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/festa-brigadeiro.jpg",
+      "description": "Brigadeiro clássico em forminha tamanho festa. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-festa-beijinho",
+      "name": "Beijinho - Tamanho Festa",
+      "category": "Tamanho Festa (forminha nº6)",
+      "price": 85,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/festa-beijinho.jpg",
+      "description": "Beijinho tradicional com coco ralado queimado. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-festa-bicho",
+      "name": "Bicho de Pé - Tamanho Festa",
+      "category": "Tamanho Festa (forminha nº6)",
+      "price": 85,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/festa-bicho.jpg",
+      "description": "Bicho de pé (chocolate com amendoim) clássico. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-festa-cajuzinho",
+      "name": "Cajuzinho - Tamanho Festa",
+      "category": "Tamanho Festa (forminha nº6)",
+      "price": 90,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/festa-cajuzinho.jpg",
+      "description": "Cajuzinho delicioso com pasta de amendoim. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-maior-brigadeiro",
+      "name": "Brigadeiro - Tamanho Maior",
+      "category": "Tamanho Maior (caixinha)",
+      "price": 140,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/maior-brigadeiro.jpg",
+      "description": "Brigadeiro em caixinha tamanho maior. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-maior-beijinho",
+      "name": "Beijinho - Tamanho Maior",
+      "category": "Tamanho Maior (caixinha)",
+      "price": 140,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/maior-beijinho.jpg",
+      "description": "Beijinho em caixinha tamanho maior. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-maior-bicho",
+      "name": "Bicho de Pé - Tamanho Maior",
+      "category": "Tamanho Maior (caixinha)",
+      "price": 140,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/maior-bicho.jpg",
+      "description": "Bicho de pé em caixinha tamanho maior. Quantidade mínima 25 unidades."
+    },
+    {
+      "id": "simples-maior-cajuzinho",
+      "name": "Cajuzinho - Tamanho Maior",
+      "category": "Tamanho Maior (caixinha)",
+      "price": 145,
+      "unit": "cento",
+      "minQuantity": 25,
+      "image": "/src/assets/products/doces-simples/maior-cajuzinho.jpg",
+      "description": "Cajuzinho em caixinha tamanho maior. Quantidade mínima 25 unidades."
+    }
+  ],
+  "docesFinos": [
+    {
+      "id": "fino-camafeu",
+      "name": "Camafeu",
+      "price": 2.8,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/camafeu.jpg",
+      "description": "Doce fino sofisticado com nozes caramelizadas."
+    },
+    {
+      "id": "fino-brigadeiro-gourmet",
+      "name": "Brigadeiro gourmet",
+      "price": 2.5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/brigadeiro-gourmet.jpg",
+      "description": "Brigadeiro premium em pequena porção, acabamento fino."
+    },
+    {
+      "id": "fino-beijinho-coco",
+      "name": "Beijinho enrolado no coco queimado",
+      "price": 2,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/beijinho-coco.jpg",
+      "description": "Beijinho delicado com coco queimado caramelizado."
+    },
+    {
+      "id": "fino-copinho",
+      "name": "Copinho de chocolate",
+      "price": 5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/copinho-chocolate.jpg",
+      "description": "Brigadeiro gourmet com cereja em copinho de chocolate."
+    },
+    {
+      "id": "fino-mini-trufa",
+      "name": "Mini trufas",
+      "price": 4,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/mini-trufa.jpg",
+      "description": "Pequenas trufas finas em chocolate escuro ou branco."
+    },
+    {
+      "id": "fino-ninho-nutella",
+      "name": "Ninho com Nutella",
+      "price": 2.5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/ninho-nutella.jpg",
+      "description": "Pequena porção premium de ninho com nutella."
+    },
+    {
+      "id": "fino-churro",
+      "name": "Churros",
+      "price": 2.5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/churro.jpg",
+      "description": "Churro crocante banhado em chocolate e açúcar."
+    },
+    {
+      "id": "fino-surpresa-uva",
+      "name": "Surpresa de uva",
+      "price": 2.5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/surpresa-uva.jpg",
+      "description": "Doce fino com uva passa envolvida em chocolate."
+    },
+    {
+      "id": "fino-ostra",
+      "name": "Ostra",
+      "price": 5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/ostra.jpg",
+      "description": "Doce sofisticado em formato de ostra com recheios variados."
+    },
+    {
+      "id": "fino-bem-casado",
+      "name": "Bem-casado",
+      "price": 5,
+      "unit": "un",
+      "minQuantity": 15,
+      "image": "/src/assets/products/doces-finos/bem-casado.jpg",
+      "description": "Doce elegante tradicional para eventos, em caixinha especial."
+    }
+  ],
+  "decoracoes": [
+    {
+      "id": "deco-raspas",
+      "name": "Raspas de chocolate",
+      "description": "Raspas de chocolate semi-amargo ou ao leite para acabamento sofisticado. Aplicadas sobre a cobertura do bolo.",
+      "price": 0,
+      "image": "/src/assets/products/decoracoes/raspas.jpg"
+    },
+    {
+      "id": "deco-frutas",
+      "name": "Frutas frescas",
+      "description": "Frutas frescas sazonais como morangos, framboesas e outras. Variam conforme disponibilidade. Agregam frescor e elegância.",
+      "note": "⚠️ As frutas frescas podem variar de acordo com a época do ano e disponibilidade no mercado.",
+      "price": 0,
+      "image": "/src/assets/products/decoracoes/frutas.jpg"
+    },
+    {
+      "id": "deco-papelArroz",
+      "name": "Papel de arroz",
+      "description": "Papel de arroz comestível com desenhos, mensagens ou logotipos personalizados. Perfeito para mensagens especiais.",
+      "note": "💡 Papel de arroz pode ser pedido com outro fornecedor ou negociado diretamente conosco para trabalhos específicos e exclusivos.",
+      "price": 0,
+      "image": "/src/assets/products/decoracoes/papel-arroz.jpg"
+    },
+    {
+      "id": "deco-toppers",
+      "name": "Toppers personalizados",
+      "description": "Toppers em acrílico ou papel com nome, tema ou mensagem personalizada. Trazem um toque único e memorável.",
+      "note": "💡 Toppers personalizados podem ser pedidos com outro fornecedor ou negociados diretamente conosco para criações especiais.",
+      "price": 0,
+      "image": "/src/assets/products/decoracoes/topper.jpg"
+    }
+  ]
+}
