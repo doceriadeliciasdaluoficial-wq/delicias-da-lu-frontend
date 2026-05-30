@@ -8,40 +8,97 @@ import { actionButtonContainer } from '../styles/buttonClasses'
 export default function OrderBuilder({ setCurrentPage }) {
   const [step, setStep] = useState(0)
   const [customKg, setCustomKg] = useState('')
+  const [hasSecondaryFilling, setHasSecondaryFilling] = useState(false)
   const [order, setOrder] = useState({
     size: '',
-    mass: '',
+    mass: 'branca',
     filling: '',
+    secondaryFilling: '',
     topping: '',
     decoration: ''
   })
   const { addToCart } = useContext(CartContext)
 
-  const steps = ['Tamanho', 'Massa', 'Recheio', 'Cobertura', 'Decoração']
-  const options = [CAKE_BUILDER.sizes, CAKE_BUILDER.masses, CAKE_BUILDER.fillings, CAKE_BUILDER.toppings, CAKE_BUILDER.decorations]
-  const optionKeys = ['size', 'mass', 'filling', 'topping', 'decoration']
+  const steps = ['Recheio', 'Massa', 'Cobertura', 'Decoração', 'Tamanho', 'Resumo']
+  const options = [CAKE_BUILDER.fillings, CAKE_BUILDER.masses, CAKE_BUILDER.toppings, CAKE_BUILDER.decorations, CAKE_BUILDER.sizes, []]
+  const optionKeys = ['filling', 'mass', 'topping', 'decoration', 'size', null]
+  const selectedPrimaryFilling = CAKE_BUILDER.fillings.find(f => f.id === order.filling)
+  const selectedSecondaryFilling = CAKE_BUILDER.fillings.find(f => f.id === order.secondaryFilling)
+  const selectedFillings = [selectedPrimaryFilling, selectedSecondaryFilling].filter(Boolean)
+  const fillingCharge = selectedFillings.reduce((highest, filling) => Math.max(highest, filling.value), 0)
+  const selectedMass = CAKE_BUILDER.masses.find(m => m.id === order.mass) || CAKE_BUILDER.masses.find(m => m.id === 'branca')
+  const selectedTopping = CAKE_BUILDER.toppings.find(t => t.id === order.topping)
+  const selectedDecoration = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)
+  const selectedSize = CAKE_BUILDER.sizes.find(s => s.id === order.size)
+  const customKgValue = customKg ? parseFloat(String(customKg).replace(',', '.')) : null
+  const selectedKg = customKgValue || (selectedSize ? parseFloat(selectedSize.id.replace('kg', '')) : 0)
+  const displayKg = selectedKg ? String(selectedKg).replace('.', ',') : ''
+  const sizeDisplay = selectedKg ? `${displayKg} kg` : 'Não selecionado'
+  const perKgPrice = selectedKg
+    ? fillingCharge + (selectedMass?.value || 0) + (selectedTopping?.value || 0) + (selectedDecoration?.value || 0)
+    : 0
+  const sizeBaseDisplay = selectedKg ? `${formatPrice(perKgPrice, false)}/kg` : 'Não selecionado'
+
+  const getFillingLabel = () => {
+    if (!selectedFillings.length) return 'Não selecionado'
+    return selectedFillings.map(filling => filling.label).join(' + ')
+  }
+
+  const summaryRows = [
+    ['Recheio', order.filling, getFillingLabel()],
+    ['Massa', order.mass, selectedMass?.label],
+    ['Cobertura', order.topping, selectedTopping?.label],
+    ['Decoração', order.decoration, selectedDecoration?.label],
+    ['Tamanho', order.size || customKg, sizeDisplay],
+    ['Valor por kg', order.size || customKg, sizeBaseDisplay]
+  ]
+  const summaryGroups = [
+    {
+      title: 'Sabores',
+      items: [
+        ['Recheio', getFillingLabel()],
+        ['Massa', selectedMass?.label]
+      ]
+    },
+    {
+      title: 'Acabamento',
+      items: [
+        ['Cobertura', selectedTopping?.label],
+        ['Decoração', selectedDecoration?.label]
+      ]
+    },
+    {
+      title: 'Tamanho',
+      items: [
+        ['Quantidade', sizeDisplay],
+        ['Valor por kg', sizeBaseDisplay]
+      ]
+    }
+  ]
 
   const handleSelect = (value) => {
-    // Se está no step 0 (tamanho) e clicando em um tamanho predefinido, limpar custom kg
     if (step === 0) {
-      if (order[optionKeys[step]] === value) {
-        setOrder(prev => ({ ...prev, [optionKeys[step]]: '' }))
-      } else {
-        setOrder(prev => ({ ...prev, [optionKeys[step]]: value }))
-        setCustomKg('') // Limpa custom kg quando seleciona tamanho predefinido
-      }
+      setOrder(prev => ({
+        ...prev,
+        filling: value,
+        secondaryFilling: prev.secondaryFilling === value ? '' : prev.secondaryFilling
+      }))
+    } else if (step === 1) {
+      setOrder(prev => ({ ...prev, mass: value }))
+    } else if (step === 2) {
+      setOrder(prev => ({ ...prev, topping: value }))
+    } else if (step === 3) {
+      setOrder(prev => ({ ...prev, decoration: value }))
+    } else if (step === 4) {
+      setOrder(prev => ({ ...prev, size: value }))
+      setCustomKg('')
     } else {
-      // Para outros steps, usa toggle normal
-      if (order[optionKeys[step]] === value) {
-        setOrder(prev => ({ ...prev, [optionKeys[step]]: '' }))
-      } else {
-        setOrder(prev => ({ ...prev, [optionKeys[step]]: value }))
-      }
+      setOrder(prev => ({ ...prev, [optionKeys[step]]: value }))
     }
   }
 
   const handleNext = () => {
-    if (step < 4) setStep(step + 1)
+    if (step < steps.length - 1) setStep(step + 1)
   }
 
   const handlePrev = () => {
@@ -49,48 +106,13 @@ export default function OrderBuilder({ setCurrentPage }) {
   }
 
   const calculatePrice = () => {
-    // Se houver quantidade customizada em kg, calcule o preço
-    if (customKg && !isNaN(customKg) && customKg > 0) {
-      const baseSize = CAKE_BUILDER.sizes[0] // 1kg = 65
-      const pricePerKg = baseSize.value
-      const kg = parseFloat(customKg)
-      
-      let total = pricePerKg * kg
-      const mass = CAKE_BUILDER.masses.find(m => m.id === order.mass)
-      if (mass) total += mass.value * kg
-      const filling = CAKE_BUILDER.fillings.find(f => f.id === order.filling)
-      if (filling) total += filling.value * kg
-      const topping = CAKE_BUILDER.toppings.find(t => t.id === order.topping)
-      if (topping) total += topping.value * kg
-      const decoration = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)
-      if (decoration) total += decoration.value * kg
-      return total
-    }
+    if (!selectedKg) return 0
 
-    // Preço dos tamanhos predefinidos
-    let total = 0
-    const sizes = CAKE_BUILDER.sizes.find(s => s.id === order.size)
-    if (sizes) total += sizes.value
-
-    const mass = CAKE_BUILDER.masses.find(m => m.id === order.mass)
-    if (mass) total += mass.value
-
-    const filling = CAKE_BUILDER.fillings.find(f => f.id === order.filling)
-    if (filling) total += filling.value
-
-    const topping = CAKE_BUILDER.toppings.find(t => t.id === order.topping)
-    if (topping) total += topping.value
-
-    const decoration = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)
-    if (decoration) total += decoration.value
-
-    return total
+    return selectedKg * perKgPrice
   }
 
   const handleAddToCart = () => {
-    const sizeObj = CAKE_BUILDER.sizes.find(s => s.id === order.size)
     const massObj = CAKE_BUILDER.masses.find(m => m.id === order.mass)
-    const fillingObj = CAKE_BUILDER.fillings.find(f => f.id === order.filling)
     const toppingObj = CAKE_BUILDER.toppings.find(t => t.id === order.topping)
     const decorationObj = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)
     const totalPrice = calculatePrice()
@@ -102,9 +124,12 @@ export default function OrderBuilder({ setCurrentPage }) {
       quantity: 1,
       type: 'customCake',
       details: {
-        size: customKg ? `${customKg}kg (Personalizado)` : sizeObj?.label,
+        size: sizeDisplay,
         mass: massObj?.label,
-        filling: fillingObj?.label,
+        kg: selectedKg,
+        pricePerKg: perKgPrice,
+        filling: getFillingLabel(),
+        fillings: selectedFillings.map(filling => filling.label),
         topping: toppingObj?.label,
         decoration: decorationObj?.label
       }
@@ -112,7 +137,8 @@ export default function OrderBuilder({ setCurrentPage }) {
 
     addToCart(cakeItem)
     setStep(0)
-    setOrder({ size: '', mass: '', filling: '', topping: '', decoration: '' })
+    setOrder({ size: '', mass: 'branca', filling: '', secondaryFilling: '', topping: '', decoration: '' })
+    setHasSecondaryFilling(false)
     setCustomKg('')
   }
 
@@ -133,20 +159,25 @@ export default function OrderBuilder({ setCurrentPage }) {
           </div>
 
           {/* Progress Steps */}
-          <div className="flex justify-between mb-12 gap-2">
+          <div className="flex justify-between mb-12 gap-2 flex-wrap">
             {steps.map((s, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center">
+              <button
+                key={i}
+                type="button"
+                onClick={() => setStep(i)}
+                className="flex-1 min-w-[110px] flex flex-col items-center"
+              >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${
-                    i <= step ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant'
+                    i === step ? 'bg-primary text-white' : i < step ? 'bg-primary/80 text-white' : 'bg-surface-container text-on-surface-variant'
                   }`}
                 >
                   {i + 1}
                 </div>
-                <p className={`mt-2 font-label-md text-label-md text-center ${i <= step ? 'text-primary' : 'text-on-surface-variant'}`}>
+                <p className={`mt-2 font-label-md text-label-md text-center ${i === step ? 'text-primary' : 'text-on-surface-variant'}`}>
                   {s}
                 </p>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -157,58 +188,147 @@ export default function OrderBuilder({ setCurrentPage }) {
               <div className="bg-surface-container-lowest p-8 rounded-lg border border-outline-variant mb-8">
                 <h2 className="font-headline-lg text-headline-lg text-primary mb-6">{steps[step]}</h2>
 
-                <div className="space-y-4 mb-8">
-                  {currentOption.map(option => (
-                    <button
-                      key={option.id}
-                      onClick={() => handleSelect(option.id)}
-                      className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                        selectedValue === option.id
-                          ? 'border-primary bg-primary/10'
-                          : 'border-outline-variant bg-surface hover:border-primary/50'
-                      }`}
-                    >
-                      <div className="flex gap-4 items-start">
-                        {/* Image */}
-                        {option.image && (
-                          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container">
-                            <img 
-                              src={option.image} 
-                              alt={option.label}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.style.display = 'none'
-                              }}
-                            />
+                {step === 5 ? (
+                  <div className="space-y-4 mb-8">
+                    <div className="rounded-xl border border-outline-variant bg-surface-container/30 p-5">
+                      <h3 className="font-headline-md text-headline-md text-on-surface mb-4">Resumo do pedido</h3>
+                      <div className="grid gap-4 md:grid-cols-3">
+                        {summaryGroups.map((group) => (
+                          <div key={group.title} className="rounded-lg border border-outline-variant bg-surface p-4">
+                            <p className="font-label-md text-label-md text-primary mb-3">{group.title}</p>
+                            <div className="space-y-2">
+                              {group.items.map(([label, value]) => (
+                                <div key={label} className="flex flex-col gap-1">
+                                  <span className="text-body-sm text-on-surface-variant">{label}</span>
+                                  <span className="font-semibold text-on-surface">{value || 'Não selecionado'}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        )}
-
-                        {/* Content */}
-                        <div className="flex-1">
-                          <p className="font-headline-md text-headline-md text-on-surface">{option.label}</p>
-                          <p className="font-body-md text-body-md text-on-surface-variant mt-1">{option.description}</p>
-                          
-                          {/* Weight/Servings info for sizes */}
-                          {option.weight && (
-                            <div className="flex gap-4 mt-2 text-body-sm text-on-surface-variant">
-                              <span>📏 {option.weight}</span>
-                              <span>👥 {option.servings}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 mb-8">
+                    {currentOption.map(option => (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSelect(option.id)}
+                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                          selectedValue === option.id
+                            ? 'border-primary bg-primary/10'
+                            : 'border-outline-variant bg-surface hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex gap-4 items-start">
+                          {/* Image */}
+                          {option.image && (
+                            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container">
+                              <img 
+                                src={option.image} 
+                                alt={option.label}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = 'none'
+                                }}
+                              />
                             </div>
                           )}
-                        </div>
 
-                        <div className="flex-shrink-0 text-right">
-                          <span className={`font-label-md text-label-md font-bold ${selectedValue === option.id ? 'text-primary' : 'text-on-surface-variant'}`}>
-                            +{formatPrice(option.value, false)}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                          {/* Content */}
+                          <div className="flex-1">
+                            <p className="font-headline-md text-headline-md text-on-surface">{option.label}</p>
+                            <p className="font-body-md text-body-md text-on-surface-variant mt-1">{option.description}</p>
+                            
+                            {/* Weight/Servings info for sizes */}
+                            {step === 4 && option.weight && (
+                              <div className="flex gap-4 mt-2 text-body-sm text-on-surface-variant">
+                                <span>📏 {option.weight}</span>
+                                <span>👥 {option.servings}</span>
+                              </div>
+                            )}
+                          </div>
 
-                {/* Custom Weight Input (for step 0 only) */}
+                          <div className="flex-shrink-0 text-right">
+                            {step !== 4 && (
+                              <span className={`font-label-md text-label-md font-bold ${selectedValue === option.id ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                +{formatPrice(option.value, false)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Optional second filling */}
                 {step === 0 && (
+                  <div className="mb-8 p-4 rounded-lg border border-outline-variant bg-surface-container/40">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+                      <div>
+                        <h3 className="font-headline-md text-headline-md text-on-surface">Segundo recheio opcional</h3>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                          Se adicionar outro recheio, a cobrança considera apenas o de maior valor.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!order.filling) return
+                          setHasSecondaryFilling(prev => {
+                            const nextValue = !prev
+                            if (!nextValue) {
+                              setOrder(current => ({ ...current, secondaryFilling: '' }))
+                            }
+                            return nextValue
+                          })
+                        }}
+                        disabled={!order.filling}
+                        className="px-4 py-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface-variant disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {hasSecondaryFilling ? 'Remover segundo recheio' : 'Adicionar segundo recheio'}
+                      </button>
+                    </div>
+
+                    {!hasSecondaryFilling && (
+                      <p className="font-body-sm text-body-sm text-primary mb-4">
+                        Adicione um segundo recheio se quiser combinar sabores. A cobrança segue o recheio de maior valor.
+                      </p>
+                    )}
+
+                    {hasSecondaryFilling && order.filling && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {CAKE_BUILDER.fillings
+                          .filter(filling => filling.id !== order.filling)
+                          .map(option => (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => {
+                                setOrder(prev => ({
+                                  ...prev,
+                                  secondaryFilling: prev.secondaryFilling === option.id ? '' : option.id
+                                }))
+                              }}
+                              className={`p-3 rounded-lg border-2 transition-all text-left ${
+                                order.secondaryFilling === option.id
+                                  ? 'border-tertiary bg-tertiary/10'
+                                  : 'border-outline-variant bg-surface hover:border-tertiary/50'
+                              }`}
+                            >
+                              <p className="font-headline-sm text-headline-sm text-on-surface">{option.label}</p>
+                              <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">+{formatPrice(option.value, false)}</p>
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Custom Weight Input (for step 4 only) */}
+                {step === 4 && (
                   <div className="bg-tertiary/10 p-4 rounded-lg border border-tertiary mb-8">
                     <label className="block font-label-md text-label-md text-on-surface mb-2">
                       ⚖️ Quantidade Personalizada em kg (opcional)
@@ -229,28 +349,28 @@ export default function OrderBuilder({ setCurrentPage }) {
                       className="w-full px-4 py-3 border border-outline-variant rounded-lg font-body-md text-body-md focus:outline-none focus:border-primary"
                     />
                     <p className="text-body-sm text-on-surface-variant mt-2">
-                      ℹ️ Informe a quantidade em kg. O preço será calculado como R$ 65,00/kg. Deixe vazio para usar os tamanhos predefinidos.
+                      ℹ️ Informe a quantidade em kg. O valor por kg será calculado com base no recheio, massa e adicionais escolhidos. Deixe vazio para usar os tamanhos predefinidos.
                     </p>
                   </div>
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex gap-4">
-                  <SecondaryButton
-                    onClick={handlePrev}
-                    disabled={step === 0}
-                  >
-                    ← Anterior
-                  </SecondaryButton>
-                  {step < 4 && (
+                {step < 5 && (
+                  <div className="flex gap-4">
+                    <SecondaryButton
+                      onClick={handlePrev}
+                      disabled={step === 0}
+                    >
+                      ← Anterior
+                    </SecondaryButton>
                     <PrimaryButton
                       onClick={handleNext}
-                      disabled={!selectedValue && !(step === 0 && customKg && customKg > 0)}
+                      disabled={!selectedValue && !(step === 4 && customKg && customKg > 0)}
                     >
                       Próximo →
                     </PrimaryButton>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -259,71 +379,81 @@ export default function OrderBuilder({ setCurrentPage }) {
               {/* Price Preview Card */}
               <div className="bg-gradient-to-br from-tertiary/20 to-tertiary/10 p-6 rounded-lg border-2 border-tertiary sticky top-32">
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-6 pb-4 border-b border-tertiary">
-                  📋 Seu Bolo
+                  {step === 5 ? '✅ Pedido pronto' : '📋 Seu Bolo'}
                 </h3>
 
                 {/* Quick Summary */}
-                <div className="space-y-4 mb-6">
-                  {/* Tamanho - show custom kg if available */}
-                  <div>
-                    <p className="font-label-md text-label-md text-on-surface-variant">Tamanho</p>
-                    <p className={`font-body-md font-bold ${customKg || order.size ? 'text-primary' : 'text-on-surface-variant'}`}>
-                      {customKg ? `${customKg}kg (Personalizado)` : (CAKE_BUILDER.sizes.find(s => s.id === order.size)?.label || 'Não selecionado')}
-                    </p>
-                  </div>
-
-                  {[
-                    ['Massa', order.mass, CAKE_BUILDER.masses.find(m => m.id === order.mass)?.label],
-                    ['Recheio', order.filling, CAKE_BUILDER.fillings.find(f => f.id === order.filling)?.label],
-                    ['Cobertura', order.topping, CAKE_BUILDER.toppings.find(t => t.id === order.topping)?.label],
-                    ['Decoração', order.decoration, CAKE_BUILDER.decorations.find(d => d.id === order.decoration)?.label]
-                  ].map(([label, key, value]) => (
-                    <div key={label}>
-                      <p className="font-label-md text-label-md text-on-surface-variant">{label}</p>
-                      <p className={`font-body-md font-bold ${key ? 'text-primary' : 'text-on-surface-variant'}`}>
-                        {value || 'Não selecionado'}
+                {step === 5 ? (
+                  <div className="space-y-3 mb-6">
+                    <div className="rounded-lg bg-surface p-4 border border-outline-variant">
+                      <p className="font-label-md text-label-md text-on-surface-variant">Resumo rápido</p>
+                      <p className="font-body-md text-body-md text-on-surface mt-2">
+                        {getFillingLabel()} • {selectedMass?.label || 'Massa não selecionada'} • {sizeDisplay}
                       </p>
                     </div>
-                  ))}
-                </div>
+                    <div className="rounded-lg bg-surface-container p-4 border border-outline-variant">
+                      <div className="flex justify-between items-center">
+                        <span className="font-label-md text-label-md text-on-surface-variant">Total</span>
+                        <span className="font-headline-md text-headline-md text-primary">{formatPrice(calculatePrice(), false)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 mb-6">
+                    {[
+                      ['Recheio', order.filling, getFillingLabel()],
+                      ['Massa', order.mass, selectedMass?.label],
+                      ['Cobertura', order.topping, selectedTopping?.label],
+                      ['Decoração', order.decoration, selectedDecoration?.label],
+                      ['Tamanho', order.size || customKg, sizeDisplay]
+                    ].map(([label, key, value]) => (
+                      <div key={label}>
+                        <p className="font-label-md text-label-md text-on-surface-variant">{label}</p>
+                        <p className={`font-body-md font-bold ${key ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          {value || 'Não selecionado'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Price Breakdown */}
                 <div className="bg-surface-container p-4 rounded-lg mb-6 border border-outline-variant">
                   <div className="space-y-2 mb-3 pb-3 border-b border-outline-variant text-body-sm">
-                    {order.size && (
+                    {order.filling && (
                       <div className="flex justify-between">
-                        <span className="text-on-surface-variant">Tamanho:</span>
-                        <span className="font-bold text-on-surface">{formatPrice(CAKE_BUILDER.sizes.find(s => s.id === order.size)?.value, false)}</span>
+                        <span className="text-on-surface-variant">Recheio:</span>
+                        <span className="font-bold text-on-surface">{formatPrice(fillingCharge, false)}</span>
                       </div>
                     )}
                     {order.mass && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant">Massa:</span>
-                        <span className="font-bold text-on-surface">{formatPrice(CAKE_BUILDER.masses.find(m => m.id === order.mass)?.value, false)}</span>
-                      </div>
-                    )}
-                    {order.filling && (
-                      <div className="flex justify-between">
-                        <span className="text-on-surface-variant">Recheio:</span>
-                        <span className="font-bold text-on-surface">{formatPrice(CAKE_BUILDER.fillings.find(f => f.id === order.filling)?.value, false)}</span>
+                        <span className="font-bold text-on-surface">{formatPrice(selectedMass?.value, false)}</span>
                       </div>
                     )}
                     {order.topping && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant">Cobertura:</span>
-                        <span className="font-bold text-on-surface">{formatPrice(CAKE_BUILDER.toppings.find(t => t.id === order.topping)?.value, false)}</span>
+                        <span className="font-bold text-on-surface">{formatPrice(selectedTopping?.value, false)}</span>
                       </div>
                     )}
                     {order.decoration && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant">Decoração:</span>
-                        <span className="font-bold text-on-surface">{formatPrice(CAKE_BUILDER.decorations.find(d => d.id === order.decoration)?.value, false)}</span>
+                        <span className="font-bold text-on-surface">{formatPrice(selectedDecoration?.value, false)}</span>
                       </div>
                     )}
-                    {customKg && (
+                    {(order.size || customKg) && (
                       <div className="flex justify-between">
-                        <span className="text-on-surface-variant">Multiplicador:</span>
-                        <span className="font-bold text-on-surface">{customKg}kg</span>
+                        <span className="text-on-surface-variant">Tamanho:</span>
+                        <span className="font-bold text-on-surface">{sizeDisplay}</span>
+                      </div>
+                    )}
+                    {(order.size || customKg) && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant">Valor por kg:</span>
+                        <span className="font-bold text-on-surface">{sizeBaseDisplay}</span>
                       </div>
                     )}
                   </div>
@@ -335,11 +465,11 @@ export default function OrderBuilder({ setCurrentPage }) {
 
                 {/* Description */}
                 <p className="text-body-sm text-on-surface-variant mb-4">
-                  💡 Customize cada etapa. Todos os valores já incluem a massa e cobertura.
+                  💡 Customize cada etapa. O total é calculado por kg com base no recheio, massa e adicionais escolhidos.
                 </p>
 
                 {/* Action Buttons - Only on final step */}
-                {step === 4 && (
+                {step === 5 && (
                   <div className={actionButtonContainer}>
                     <PrimaryButton
                       onClick={handleAddToCart}
@@ -352,7 +482,7 @@ export default function OrderBuilder({ setCurrentPage }) {
                       onClick={() => {
                         const tamanho = customKg ? `${customKg}kg (Personalizado)` : CAKE_BUILDER.sizes.find(s => s.id === order.size)?.label || 'Não definido'
                         const massa = CAKE_BUILDER.masses.find(m => m.id === order.mass)?.label || 'Não definido'
-                        const recheio = CAKE_BUILDER.fillings.find(f => f.id === order.filling)?.label || 'Não definido'
+                        const recheio = getFillingLabel()
                         const cobertura = CAKE_BUILDER.toppings.find(t => t.id === order.topping)?.label || 'Não definido'
                         const decoracao = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)?.label || 'Não definido'
                         const preco = calculatePrice().toFixed(2)

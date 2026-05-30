@@ -49,7 +49,7 @@
     {
       "id": "chocolate",
       "label": "Chocolate",
-      "value": 5,
+      "value": 0,
       "description": "Massa de chocolate intenso",
       "fullDescription": "Massa de chocolate feita com cacau de qualidade premium. Ideal para quem ama chocolate e busca um sabor mais intenso.",
       "image": "/src/assets/cake-builder/massas/chocolate.jpg"
@@ -58,8 +58,8 @@
       "id": "redvelvet",
       "label": "Red Velvet",
       "value": 10,
-      "description": "Massa vermelha elegante com baunilha",
-      "fullDescription": "Red Velvet é uma massa vermelha sofisticada com toque sutil de baunilha e um leve azedinho que vem do fermento azedo. Combinada com frosting branco, cria uma combinação clássica e elegante.",
+      "description": "Massa vermelha elegante com adicional na base",
+      "fullDescription": "Red Velvet é uma massa vermelha sofisticada com toque sutil de baunilha e um leve azedinho que vem do fermento azedo. Ela entra como um adicional sobre a massa padrão, que é branca ou chocolate.",
       "image": "/src/assets/cake-builder/massas/redvelvet.jpg"
     }
   ],

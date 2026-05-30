@@ -39,7 +39,7 @@ export default function CartSidebar() {
                   <div style="margin-top: 8px; font-size: 12px; color: #666;">
                     ${item.details.size ? `<p style="margin: 3px 0;">• Tamanho: ${item.details.size}</p>` : ''}
                     ${item.details.mass ? `<p style="margin: 3px 0;">• Massa: ${item.details.mass}</p>` : ''}
-                    ${item.details.filling ? `<p style="margin: 3px 0;">• Recheio: ${item.details.filling}</p>` : ''}
+                    ${item.details.fillings?.length ? `<p style="margin: 3px 0;">• Recheio: ${item.details.fillings.join(' + ')}</p>` : item.details.filling ? `<p style="margin: 3px 0;">• Recheio: ${item.details.filling}</p>` : ''}
                     ${item.details.topping ? `<p style="margin: 3px 0;">• Cobertura: ${item.details.topping}</p>` : ''}
                     ${item.details.decoration ? `<p style="margin: 3px 0;">• Decoração: ${item.details.decoration}</p>` : ''}
                   </div>
@@ -155,7 +155,7 @@ export default function CartSidebar() {
                         <div className="mt-2 p-2 bg-background rounded text-xs text-on-surface-variant space-y-1">
                           {item.details.size && <p><span className="font-semibold">Tamanho:</span> {item.details.size}</p>}
                           {item.details.mass && <p><span className="font-semibold">Massa:</span> {item.details.mass}</p>}
-                          {item.details.filling && <p><span className="font-semibold">Recheio:</span> {item.details.filling}</p>}
+                          {item.details.fillings?.length ? <p><span className="font-semibold">Recheio:</span> {item.details.fillings.join(' + ')}</p> : item.details.filling && <p><span className="font-semibold">Recheio:</span> {item.details.filling}</p>}
                           {item.details.topping && <p><span className="font-semibold">Cobertura:</span> {item.details.topping}</p>}
                           {item.details.decoration && <p><span className="font-semibold">Decoração:</span> {item.details.decoration}</p>}
                         </div>
