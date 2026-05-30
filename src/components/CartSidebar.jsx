@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { CartContext } from '../context/CartContext'
 import html2pdf from 'html2pdf.js'
+import { CONTACTS } from '../config'
 import { formatPrice, calculateSubtotal } from '../utils/formatPrice'
 
 export default function CartSidebar() {
@@ -15,6 +16,68 @@ export default function CartSidebar() {
     }
     onCartAddRef.current = triggerAnimation
   }, [])
+
+  const formatCurrency = (value) => {
+    const numericValue = parseFloat(String(value).replace(',', '.')) || 0
+    return `R$ ${numericValue.toFixed(2).replace('.', ',')}`
+  }
+
+  const buildCartItemMessage = (item, index) => {
+    const price = parseFloat(String(item.price).replace(',', '.')) || 0
+    const quantity = item.quantity || 1
+    const subtotal = calculateSubtotal(price, quantity, item.unit || 'un')
+
+    const lines = [`${index + 1}. ${item.name}`]
+
+    if (item.details?.kg) {
+      lines.push(`   • Quantidade: ${String(item.details.kg).replace('.', ',')} kg`)
+    } else if (item.quantity) {
+      lines.push(`   • Quantidade: ${quantity} un`)
+    }
+
+    if (item.details?.fillings?.length) {
+      lines.push(`   • Recheio: ${item.details.fillings.join(' + ')}`)
+    } else if (item.details?.filling) {
+      lines.push(`   • Recheio: ${item.details.filling}`)
+    }
+
+    if (item.details?.mass) {
+      lines.push(`   • Massa: ${item.details.mass}`)
+    }
+
+    if (item.details?.topping) {
+      lines.push(`   • Cobertura: ${item.details.topping}`)
+    }
+
+    if (item.details?.decoration) {
+      lines.push(`   • Decoração: ${item.details.decoration}`)
+    }
+
+    if (item.details?.pricePerKg) {
+      lines.push(`   • Valor por kg: ${formatCurrency(item.details.pricePerKg)}/kg`)
+    } else {
+      lines.push(`   • Preço unitário: ${formatCurrency(price)}/${item.unit || 'un'}`)
+    }
+
+    lines.push(`   • Subtotal: ${subtotal}`)
+
+    return lines.join('\n')
+  }
+
+  const buildWhatsAppMessage = () => {
+    const itemsBlock = cartItems.map((item, index) => buildCartItemMessage(item, index)).join('\n\n')
+    const totalBlock = `Total do pedido: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}`
+
+    return [
+      'Oi Lú! Aqui está meu pedido:',
+      '',
+      itemsBlock,
+      '',
+      totalBlock,
+      '',
+      'Se quiser, posso ajustar qualquer detalhe antes de fechar.'
+    ].join('\n')
+  }
 
   const generatePDF = () => {
     const element = document.createElement('div')
@@ -240,13 +303,7 @@ export default function CartSidebar() {
             </div>
 
             <a
-              href={`https://wa.me/5511945754150?text=Oi Lú! Aqui está meu pedido:${cartItems.map(i => {
-                const price = parseFloat(i.price.toString().replace(',', '.')) || 0
-                const itemPrice = i.unit === 'cento' 
-                  ? (price * (i.quantity || 1) / 100).toFixed(2)
-                  : (price * (i.quantity || 1)).toFixed(2)
-                return `\n- ${i.name} ${i.quantity ? `(${i.quantity} un)` : ''} - R$ ${itemPrice.replace('.', ',')}`
-              }).join('')}\n\nTotal: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}`}
+              href={`${CONTACTS.whatsapp.link}?text=${encodeURIComponent(buildWhatsAppMessage())}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors shadow-md block text-center cursor-pointer flex items-center justify-center gap-2"

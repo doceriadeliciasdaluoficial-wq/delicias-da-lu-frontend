@@ -117,7 +117,7 @@ export default function Menu({ setCurrentPage }) {
                           )}
                           {item.customPrice && (
                             <button
-                              onClick={() => window.open(`${CONTACTS.whatsapp.link}?text=${CONTACTS.whatsapp.message.custom}%20${item.name}`)}
+                              onClick={() => window.open(`${CONTACTS.whatsapp.link}?text=${encodeURIComponent(`${CONTACTS.whatsapp.message.custom}\n\nItem: ${item.name}\nValor: a combinar`)}`, '_blank')}
                               className="w-full py-2 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors cursor-pointer"
                             >
                               Consultar

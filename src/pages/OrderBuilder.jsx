@@ -111,6 +111,32 @@ export default function OrderBuilder({ setCurrentPage }) {
     return selectedKg * perKgPrice
   }
 
+  const buildWhatsAppMessage = () => {
+    const totalPrice = formatPrice(calculatePrice(), false)
+    const massPrice = formatPrice(selectedMass?.value, false)
+    const toppingPrice = formatPrice(selectedTopping?.value, false)
+    const decorationPrice = formatPrice(selectedDecoration?.value, false)
+    const fillingPrice = formatPrice(fillingCharge, false)
+
+    return [
+      'Oi Lú! Vi seu Cake Builder e gostaria de fazer um bolo personalizado:',
+      '',
+      `- Recheio: ${getFillingLabel()}`,
+      `- Valor do recheio: R$ ${fillingPrice}`,
+      `- Massa: ${selectedMass?.label || 'Não definido'}`,
+      `- Valor da massa: R$ ${massPrice}`,
+      `- Cobertura: ${selectedTopping?.label || 'Não definida'}`,
+      `- Valor da cobertura: R$ ${toppingPrice}`,
+      `- Decoração: ${selectedDecoration?.label || 'Não definida'}`,
+      `- Valor da decoração: R$ ${decorationPrice}`,
+      `- Tamanho: ${sizeDisplay}`,
+      `- Valor por kg: ${sizeBaseDisplay}`,
+      `- Valor total: R$ ${totalPrice}`,
+      '',
+      'Se precisar, posso ajustar qualquer detalhe antes de confirmar.'
+    ].join('\n')
+  }
+
   const handleAddToCart = () => {
     const massObj = CAKE_BUILDER.masses.find(m => m.id === order.mass)
     const toppingObj = CAKE_BUILDER.toppings.find(t => t.id === order.topping)
@@ -480,14 +506,7 @@ export default function OrderBuilder({ setCurrentPage }) {
                     </PrimaryButton>
                     <TertiaryButton
                       onClick={() => {
-                        const tamanho = customKg ? `${customKg}kg (Personalizado)` : CAKE_BUILDER.sizes.find(s => s.id === order.size)?.label || 'Não definido'
-                        const massa = CAKE_BUILDER.masses.find(m => m.id === order.mass)?.label || 'Não definido'
-                        const recheio = getFillingLabel()
-                        const cobertura = CAKE_BUILDER.toppings.find(t => t.id === order.topping)?.label || 'Não definido'
-                        const decoracao = CAKE_BUILDER.decorations.find(d => d.id === order.decoration)?.label || 'Não definido'
-                        const preco = calculatePrice().toFixed(2)
-                        const msg = `Olá! Vi seu Cake Builder e gostaria de fazer um bolo personalizado:\n\n- Tamanho: ${tamanho}\n- Massa: ${massa}\n- Recheio: ${recheio}\n- Cobertura: ${cobertura}\n- Decoração: ${decoracao}\n\nValor: R$ ${preco}`
-                        window.open(CONTACTS.whatsapp.link + '?text=' + encodeURIComponent(msg), '_blank')
+                        window.open(CONTACTS.whatsapp.link + '?text=' + encodeURIComponent(buildWhatsAppMessage()), '_blank')
                       }}
                     >
                       <span className="material-symbols-outlined text-[20px] leading-none">chat</span>
