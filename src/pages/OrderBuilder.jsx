@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react'
 import { CartContext } from '../context/CartContext'
-import { CAKE_BUILDER, CONTACTS } from '../config'
 import { formatPrice } from '../utils/formatPrice'
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../components/Button'
 import { actionButtonContainer } from '../styles/buttonClasses'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function OrderBuilder({ setCurrentPage }) {
   const [step, setStep] = useState(0)
@@ -18,6 +18,8 @@ export default function OrderBuilder({ setCurrentPage }) {
     decoration: ''
   })
   const { addToCart } = useContext(CartContext)
+  const { cakeBuilder, contacts } = useSiteData()
+  const CAKE_BUILDER = cakeBuilder
 
   const steps = ['Recheio', 'Massa', 'Cobertura', 'Decoração', 'Tamanho', 'Resumo']
   const options = [CAKE_BUILDER.fillings, CAKE_BUILDER.masses, CAKE_BUILDER.toppings, CAKE_BUILDER.decorations, CAKE_BUILDER.sizes, []]
@@ -508,7 +510,7 @@ export default function OrderBuilder({ setCurrentPage }) {
                     </PrimaryButton>
                     <TertiaryButton
                       onClick={() => {
-                        window.open(CONTACTS.whatsapp.link + '?text=' + encodeURIComponent(buildWhatsAppMessage()), '_blank')
+                        window.open(contacts.whatsapp.link + '?text=' + encodeURIComponent(buildWhatsAppMessage()), '_blank')
                       }}
                       className="w-full"
                     >

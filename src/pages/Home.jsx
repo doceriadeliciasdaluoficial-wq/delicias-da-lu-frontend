@@ -1,61 +1,30 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { CartContext } from '../context/CartContext'
-import { CAKE_BUILDER, CONTACTS } from '../config'
 import { formatPrice } from '../utils/formatPrice'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function Home({ setCurrentPage }) {
   const { addToCart } = useContext(CartContext)
+  const { cakeBuilder, contacts, siteConfig } = useSiteData()
   const [currentSlide, setCurrentSlide] = useState(0)
-
-  const featuredCakes = [
-    {
-      name: 'Ninho com Nutella',
-      defaultWeight: '1.5kg',
-      defaultConfig: 'Massa Branca, Recheio Ninho com Nutella, Cobertura Ganache, Decoração Raspas',
-      basePrice: 95.00,
-      tag: 'Mais Vendido',
-      image: '/images/bolos/ninho-nutella.jpg',
-      description: 'Combinação irresistível de Ninho com Nutella - um clássico que nunca sai de moda. Essa é nossa configuração mais vendida: massa branca macia combinada com recheio cremoso de Ninho e Nutella, coberta com ganache brilhante e finalizada com raspas de chocolate. Ideal para 12-15 pessoas.',
-      config: { size: '1.5kg', mass: 'branca', filling: 'nutella', topping: 'ganache', decoration: 'raspas' }
-    },
-    {
-      name: 'Floresta Negra',
-      defaultWeight: '1.5kg',
-      defaultConfig: 'Massa Chocolate, Recheio Chocolate, Cobertura Calda, Decoração Frutas',
-      basePrice: 110.00,
-      tag: null,
-      image: '/images/bolos/floresta-negra.jpg',
-      description: 'Clássico alemão que traz elegância em cada fatia. A nossa versão em 1,5kg apresenta massa de chocolate intenso, recheio de mousse de chocolate, cobertura em calda quente e finalização com frutas frescas. Uma combinação sofisticada para celebrações especiais.',
-      config: { size: '1.5kg', mass: 'chocolate', filling: 'chocolate', topping: 'calda', decoration: 'frutas' }
-    },
-    {
-      name: 'Red Velvet Especial',
-      defaultWeight: '1.5kg',
-      defaultConfig: 'Massa Red Velvet, Recheio Ninho, Cobertura Ganache, Decoração Toppers',
-      basePrice: 120.00,
-      tag: 'Novo',
-      image: '/images/bolos/redvelvet.jpg',
-      description: 'Massa vermelha elegante com frosting branco sofisticado. Em 1,5kg, essa criação traz a beleza visual do Red Velvet com a cremosidade do recheio de Ninho, finalizado com ganache e toppers personalizados. Perfeita para momentos memoráveis.',
-      config: { size: '1.5kg', mass: 'redvelvet', filling: 'ninho', topping: 'ganache', decoration: 'toppers' }
-    },
-    {
-      name: 'Brigadeiro Gourmet',
-      defaultWeight: '1.5kg',
-      defaultConfig: 'Massa Chocolate, Recheio Brigadeiro, Cobertura Ganache, Decoração Raspas',
-      basePrice: 110.00,
-      tag: null,
-      image: '/images/bolos/chocolate-brigadeiro-gourmet.jpg',
-      description: 'Brigadeiro premium com chocolate de qualidade superior - perfeito para quem ama chocolate. Em 1,5kg, essa versão apresenta massa de chocolate intenso, recheio brigadeiro caseiro gourmet, cobertura ganache e acabamento em raspas de chocolate.',
-      config: { size: '1.5kg', mass: 'chocolate', filling: 'brigadeiro', topping: 'ganache', decoration: 'raspas' }
-    }
-  ]
+  const featuredCakes = siteConfig.home?.featuredCakes || []
 
   // Auto-advance carousel every 4 seconds on desktop, 5 on mobile
   useEffect(() => {
+    if (!featuredCakes.length) return undefined
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % featuredCakes.length)
     }, 4000)
     return () => clearInterval(interval)
+  }, [featuredCakes.length])
+
+  useEffect(() => {
+    if (!featuredCakes.length) {
+      setCurrentSlide(0)
+      return
+    }
+
+    setCurrentSlide((prev) => Math.min(prev, featuredCakes.length - 1))
   }, [featuredCakes.length])
 
   const handleAddCake = (cake) => {
@@ -66,13 +35,13 @@ export default function Home({ setCurrentPage }) {
       quantity: 1,
       isCake: true,
       details: {
-        size: CAKE_BUILDER.sizes.find(s => s.id === cake.config.size)?.label,
-        weight: CAKE_BUILDER.sizes.find(s => s.id === cake.config.size)?.weight,
-        servings: CAKE_BUILDER.sizes.find(s => s.id === cake.config.size)?.servings,
-        mass: CAKE_BUILDER.masses.find(m => m.id === cake.config.mass)?.label,
-        filling: CAKE_BUILDER.fillings.find(f => f.id === cake.config.filling)?.label,
-        topping: CAKE_BUILDER.toppings.find(t => t.id === cake.config.topping)?.label,
-        decoration: CAKE_BUILDER.decorations.find(d => d.id === cake.config.decoration)?.label
+        size: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.label,
+        weight: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.weight,
+        servings: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.servings,
+        mass: cakeBuilder.masses.find(m => m.id === cake.config.mass)?.label,
+        filling: cakeBuilder.fillings.find(f => f.id === cake.config.filling)?.label,
+        topping: cakeBuilder.toppings.find(t => t.id === cake.config.topping)?.label,
+        decoration: cakeBuilder.decorations.find(d => d.id === cake.config.decoration)?.label
       }
     })
   }
@@ -104,7 +73,7 @@ export default function Home({ setCurrentPage }) {
               Ver Cardápio
             </button>
             <a
-              href="https://wa.me/5511945754150?text=Oi Lú! Vim pelo site e quero fazer um pedido!"
+              href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-4 bg-white text-on-surface border border-outline-variant font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.1)] hover:bg-surface hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto"
@@ -130,8 +99,14 @@ export default function Home({ setCurrentPage }) {
           </div>
 
           {/* Products Grid - Desktop / Carousel - Mobile */}
-          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredCakes.map((cake, i) => (
+          {featuredCakes.length === 0 ? (
+            <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-8 text-center text-on-surface-variant">
+              Nenhum destaque foi configurado ainda. Abra o painel de manutenção para adicionar os bolos da Home.
+            </div>
+          ) : (
+            <>
+              <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredCakes.map((cake, i) => (
               <div
                 key={i}
                 className="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.05)] border border-outline-variant overflow-hidden group hover:shadow-[0_8px_24px_rgba(62,31,13,0.1)] transition-shadow"
@@ -170,14 +145,14 @@ export default function Home({ setCurrentPage }) {
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+                ))}
+              </div>
 
-          {/* Mobile Carousel */}
-          <div className="md:hidden relative -mx-2 sm:mx-0">
-            <div className="overflow-hidden rounded-xl">
-              <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-                {featuredCakes.map((cake, i) => (
+              {/* Mobile Carousel */}
+              <div className="md:hidden relative -mx-2 sm:mx-0">
+                <div className="overflow-hidden rounded-xl">
+                  <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                    {featuredCakes.map((cake, i) => (
                   <div key={i} className="w-full flex-shrink-0">
                     <div className="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.05)] border border-outline-variant overflow-hidden">
                       <div className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden">
@@ -215,42 +190,44 @@ export default function Home({ setCurrentPage }) {
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Carousel Controls */}
-            <div className="flex items-center justify-between mt-6 gap-4">
-              <button
-                onClick={() => setCurrentSlide((prev) => (prev - 1 + featuredCakes.length) % featuredCakes.length)}
-                className="p-2 rounded-full bg-primary text-white hover:bg-primary-light transition-colors"
-                title="Anterior"
-              >
-                <span className="material-symbols-outlined">chevron_left</span>
-              </button>
-              
-              <div className="flex gap-2">
-                {featuredCakes.map((_, i) => (
+                {/* Carousel Controls */}
+                <div className="flex items-center justify-between mt-6 gap-4">
                   <button
-                    key={i}
-                    onClick={() => setCurrentSlide(i)}
-                    className={`h-3 rounded-full transition-all ${
-                      i === currentSlide ? 'bg-primary w-8' : 'bg-outline-variant w-3 hover:bg-outline'
-                    }`}
-                    title={`Ir para bolo ${i + 1}`}
-                  />
-                ))}
-              </div>
+                    onClick={() => setCurrentSlide((prev) => (prev - 1 + featuredCakes.length) % featuredCakes.length)}
+                    className="p-2 rounded-full bg-primary text-white hover:bg-primary-light transition-colors"
+                    title="Anterior"
+                  >
+                    <span className="material-symbols-outlined">chevron_left</span>
+                  </button>
 
-              <button
-                onClick={() => setCurrentSlide((prev) => (prev + 1) % featuredCakes.length)}
-                className="p-2 rounded-full bg-primary text-white hover:bg-primary-light transition-colors"
-                title="Próximo"
-              >
-                <span className="material-symbols-outlined">chevron_right</span>
-              </button>
-            </div>
-          </div>
+                  <div className="flex gap-2">
+                    {featuredCakes.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentSlide(i)}
+                        className={`h-3 rounded-full transition-all ${
+                          i === currentSlide ? 'bg-primary w-8' : 'bg-outline-variant w-3 hover:bg-outline'
+                        }`}
+                        title={`Ir para bolo ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentSlide((prev) => (prev + 1) % featuredCakes.length)}
+                    className="p-2 rounded-full bg-primary text-white hover:bg-primary-light transition-colors"
+                    title="Próximo"
+                  >
+                    <span className="material-symbols-outlined">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -273,7 +250,7 @@ export default function Home({ setCurrentPage }) {
               🎂 Acessar Cake Builder
             </button>
             <a
-              href="https://wa.me/5511945754150?text=Oi Lú! Gostaria de solicitar um orçamento para um bolo personalizado!"
+              href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.custom)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-4 border-2 border-primary-fixed text-surface-container-lowest font-label-md text-label-md rounded-lg hover:bg-primary-fixed/20 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
@@ -290,7 +267,7 @@ export default function Home({ setCurrentPage }) {
           <div className="flex flex-col items-center mb-12 text-center">
             <div className="flex items-center gap-2 mb-2">
               <span className="material-symbols-outlined text-primary">photo_camera</span>
-              <span className="font-label-md text-label-md text-primary tracking-widest uppercase">@deliciasda.lu.oficial</span>
+              <span className="font-label-md text-label-md text-primary tracking-widest uppercase">{contacts.instagram.handle}</span>
             </div>
             <h2 className="font-headline-lg text-headline-lg text-on-background">
               Acompanhe nosso dia a dia
@@ -300,7 +277,7 @@ export default function Home({ setCurrentPage }) {
           {/* Instagram Embed */}
           <div className="flex justify-center mb-12 overflow-hidden rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.1)]">
             <iframe
-              src="https://www.instagram.com/deliciasda.lu.oficial/embed"
+              src={contacts.instagram.embedUrl}
               width="100%"
               height="520"
               frameBorder="0"
@@ -312,7 +289,7 @@ export default function Home({ setCurrentPage }) {
 
           <div className="text-center">
             <a
-              href="https://www.instagram.com/deliciasda.lu.oficial/?hl=pt-br"
+              href={contacts.instagram.url}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-variant transition-colors cursor-pointer inline-block"

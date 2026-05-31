@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CartProvider } from './context/CartContext'
 import Navbar from './components/Navbar'
 import CartSidebar from './components/CartSidebar'
@@ -9,9 +9,35 @@ import Menu from './pages/Menu'
 import OrderBuilder from './pages/OrderBuilder'
 import AboutUs from './pages/AboutUs'
 import Contact from './pages/Contact'
+import AdminPanel from './pages/AdminPanel'
+
+const ADMIN_PATH = '/painel-interno-secreto-lu'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
+  const [isAdminRoute, setIsAdminRoute] = useState(() =>
+    window.location.pathname.startsWith(ADMIN_PATH)
+  )
+
+  useEffect(() => {
+    const syncRoute = () => {
+      setIsAdminRoute(window.location.pathname.startsWith(ADMIN_PATH))
+    }
+
+    window.addEventListener('popstate', syncRoute)
+    return () => window.removeEventListener('popstate', syncRoute)
+  }, [])
+
+  const leaveAdmin = () => {
+    window.history.pushState({}, '', '/')
+    setIsAdminRoute(false)
+    setCurrentPage('home')
+    window.scrollTo(0, 0)
+  }
+
+  if (isAdminRoute) {
+    return <AdminPanel onExit={leaveAdmin} />
+  }
 
   const renderPage = () => {
     switch (currentPage) {

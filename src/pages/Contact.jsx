@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function Contact({ setCurrentPage }) {
+  const { contacts } = useSiteData()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -43,19 +45,22 @@ export default function Contact({ setCurrentPage }) {
                 icon: 'chat',
                 title: 'WhatsApp',
                 description: 'Envie mensagens e faça seus pedidos',
-                action: 'Enviar Mensagem'
+                action: 'Enviar Mensagem',
+                href: `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`
               },
               {
                 icon: 'phone',
                 title: 'Telefone',
                 description: 'Ligue para falar com a gente',
-                action: 'Ligar'
+                action: 'Ligar',
+                href: `tel:+${contacts.whatsapp.number}`
               },
               {
                 icon: 'mail',
                 title: 'Email',
                 description: 'Envie um email com sua dúvida',
-                action: 'Enviar Email'
+                action: 'Enviar Email',
+                href: `mailto:${contacts.email.address}`
               },
             ].map((contact, idx) => (
               <div
@@ -71,9 +76,9 @@ export default function Contact({ setCurrentPage }) {
                 <p className="font-body-md text-body-md text-on-surface-variant mb-6">
                   {contact.description}
                 </p>
-                <button className="px-4 py-2 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-surface-tint transition-colors w-full sm:w-auto">
+                <a href={contact.href} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-surface-tint transition-colors w-full sm:w-auto">
                   {contact.action}
-                </button>
+                </a>
               </div>
             ))}
           </div>
@@ -81,7 +86,7 @@ export default function Contact({ setCurrentPage }) {
           {/* Google Maps */}
           <div className="rounded-xl overflow-hidden shadow-lg mb-12 h-80 sm:h-96">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.6825437833646!2d-46.5391423!3d-23.4444679!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cef51ee08e0a3d%3A0xb92a7fbdb27f2844!2sCondom%C3%ADnio%20Vida%20Plena!5e0!3m2!1spt-BR!2sbr!4v1715580043256"
+              src={contacts.location.mapsUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -176,8 +181,8 @@ export default function Contact({ setCurrentPage }) {
         </h2>
         <div className="flex justify-center items-center gap-4 flex-wrap">
           <span className="material-symbols-outlined text-4xl">photo_camera</span>
-          <a href="#" className="font-label-md text-label-md hover:text-primary-fixed underline">
-            @deliciasdalu
+          <a href={contacts.instagram.url} target="_blank" rel="noopener noreferrer" className="font-label-md text-label-md hover:text-primary-fixed underline">
+            {contacts.instagram.handle}
           </a>
         </div>
       </section>

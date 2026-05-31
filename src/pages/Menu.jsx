@@ -1,12 +1,21 @@
 import React, { useState, useContext } from 'react'
 import { CartContext } from '../context/CartContext'
-import { MENU_ITEMS, CONTACTS } from '../config'
 import { formatPrice, formatPriceWithUnit } from '../utils/formatPrice'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function Menu({ setCurrentPage }) {
   const [activeTab, setActiveTab] = useState('bolos')
   const [sweetQuantities, setSweetQuantities] = useState({})
   const { addToCart } = useContext(CartContext)
+  const { menuData, contacts } = useSiteData()
+  const customSections = menuData.customSections || []
+  const tabs = [
+    { id: 'bolos', label: '🍰 Bolos' },
+    { id: 'doces_simples', label: '🍫 Doces Simples' },
+    { id: 'doces_finos', label: '✨ Doces Finos' },
+    { id: 'decoracoes', label: '🎀 Decorações' },
+    ...customSections.map((section) => ({ id: section.id, label: section.label }))
+  ]
 
   const handleAddSweet = (item, quantity, minQty) => {
     if (quantity >= minQty) {
@@ -46,12 +55,7 @@ export default function Menu({ setCurrentPage }) {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-10 flex-nowrap overflow-x-auto justify-start md:justify-center sticky top-16 md:top-20 bg-background py-3 z-30 border-b border-outline-variant/60 md:border-b-0 md:relative md:top-0 md:bg-transparent md:py-0 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {[
-            { id: 'bolos', label: '🍰 Bolos' },
-            { id: 'doces_simples', label: '🍫 Doces Simples' },
-            { id: 'doces_finos', label: '✨ Doces Finos' },
-            { id: 'decoracoes', label: '🎀 Decorações' }
-          ].map(tab => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -71,7 +75,7 @@ export default function Menu({ setCurrentPage }) {
           {/* BOLOS TAB */}
           {activeTab === 'bolos' && (
             <div className="space-y-12">
-              {MENU_ITEMS.bolos.reduce((acc, item) => {
+              {(menuData.bolos || []).reduce((acc, item) => {
                 const categoryExists = acc.find(c => c.category === item.category)
                 if (categoryExists) {
                   categoryExists.items.push(item)
@@ -117,7 +121,7 @@ export default function Menu({ setCurrentPage }) {
                           )}
                           {item.customPrice && (
                             <button
-                              onClick={() => window.open(`${CONTACTS.whatsapp.link}?text=${encodeURIComponent(`${CONTACTS.whatsapp.message.custom}\n\nItem: ${item.name}\nValor: a combinar`)}`, '_blank')}
+                              onClick={() => window.open(`${contacts.whatsapp.link}?text=${encodeURIComponent(`${contacts.whatsapp.message.custom}\n\nItem: ${item.name}\nValor: a combinar`)}`, '_blank')}
                               className="w-full py-2 bg-primary text-white font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-primary-light transition-colors cursor-pointer"
                             >
                               Consultar
@@ -138,7 +142,7 @@ export default function Menu({ setCurrentPage }) {
               <div>
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Festa (forminha nº6)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                  {MENU_ITEMS.docesSimples
+                  {(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Festa (forminha nº6)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
@@ -168,7 +172,7 @@ export default function Menu({ setCurrentPage }) {
               <div>
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Maior (caixinha)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                  {MENU_ITEMS.docesSimples
+                  {(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Maior (caixinha)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
@@ -203,7 +207,7 @@ export default function Menu({ setCurrentPage }) {
             <div>
               <h3 className="font-headline-md text-headline-md text-primary mb-6">Doces Finos (por unidade, mín. 15)</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                {MENU_ITEMS.docesFinos.map((item, i) => (
+                {(menuData.docesFinos || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                     <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl">
                       {item.image ? (
@@ -238,7 +242,7 @@ export default function Menu({ setCurrentPage }) {
               <h3 className="font-headline-md text-headline-md text-primary mb-6">Opções de Decoração</h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-8">Decorações têm valores à parte. Consulte no orçamento.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {MENU_ITEMS.decoracoes.map((item, i) => (
+                {(menuData.decoracoes || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm p-5 sm:p-6">
                     <div className="flex gap-4">
                       <span className="text-5xl flex-shrink-0">
@@ -262,13 +266,72 @@ export default function Menu({ setCurrentPage }) {
               </div>
             </div>
           )}
+
+          {customSections
+            .filter((section) => section.id === activeTab)
+            .map((section) => (
+              <div key={section.id}>
+                <h3 className="font-headline-md text-headline-md text-primary mb-6">{section.label}</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                  {(section.items || []).map((item, i) => (
+                    <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
+                      <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name || item.label} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
+                        ) : <span>🍮</span>}
+                      </div>
+                      <div className="p-3 sm:p-6">
+                        <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name || item.label}</h4>
+                        {item.description && (
+                          <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mb-3 sm:mb-4 line-clamp-3">{item.description}</p>
+                        )}
+                        {item.price !== undefined && (
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="font-label-md text-[0.8rem] sm:text-label-md text-primary font-bold">{formatPriceWithUnit(item.price, item.unit || 'un')}</span>
+                          </div>
+                        )}
+
+                        {item.minQuantity ? (
+                          <>
+                            <div className="flex items-center gap-1 mb-3 min-w-0">
+                              <input
+                                type="number"
+                                min={item.minQuantity}
+                                step={item.minQuantity}
+                                defaultValue={item.minQuantity}
+                                onChange={(e) => setSweetQuantities(prev => ({ ...prev, [item.name || item.label]: parseInt(e.target.value) || item.minQuantity }))}
+                                className="flex-1 min-w-0 px-2 py-2 border border-outline-variant rounded bg-surface font-label-md text-[0.85rem] sm:text-label-md focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                              <span className="text-xs sm:text-sm text-on-surface-variant flex-shrink-0">un</span>
+                            </div>
+                            <button
+                              onClick={() => handleAddSweet(item, sweetQuantities[item.name || item.label] || item.minQuantity, item.minQuantity)}
+                              className="w-full py-2 bg-primary text-white font-label-md text-[0.78rem] sm:text-label-md rounded-lg hover:bg-primary-light transition-colors cursor-pointer leading-tight min-h-10"
+                            >
+                              Adicionar ao Carrinho
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => handleAddBoloSimples(item)}
+                            className="w-full py-2 bg-primary text-white font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-primary-light transition-colors cursor-pointer"
+                          >
+                            Adicionar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
         </div>
 
         {/* CTA Footer */}
         <div className="mt-20 text-center p-6 sm:p-8 bg-primary/10 rounded-lg border border-primary/20">
           <p className="font-body-md text-body-md text-on-surface mb-4">Tem dúvidas ou quer algo personalizado?</p>
           <a
-            href={CONTACTS.whatsapp.link}
+            href={contacts.whatsapp.link}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-8 py-3 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors w-full sm:w-auto"

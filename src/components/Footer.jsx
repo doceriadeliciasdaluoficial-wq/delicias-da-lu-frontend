@@ -1,8 +1,10 @@
 import React from 'react'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function Footer() {
-  const whatsappLink = 'https://wa.me/5511945754150?text=Oi Lú! Vim pelo site e gostaria de fazer um pedido!'
-  const email = 'gab.ponsoni@gmail.com'
+  const { contacts } = useSiteData()
+  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`
+  const email = contacts.email.address
 
   return (
     <footer className="bg-surface border-t border-outline-variant mt-16">
@@ -76,7 +78,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://www.instagram.com/deliciasda.lu.oficial/?hl=pt-br"
+                  href={contacts.instagram.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
@@ -119,7 +121,7 @@ export default function Footer() {
           </p>
           <div className="flex gap-4 flex-wrap justify-center md:justify-end">
             <a
-              href="https://www.instagram.com/deliciasda.lu.oficial/?hl=pt-br"
+              href={contacts.instagram.url}
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 flex items-center justify-center bg-surface-container-lowest rounded-full text-primary hover:bg-primary hover:text-white transition-all"

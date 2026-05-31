@@ -1,13 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { CartContext } from '../context/CartContext'
 import html2pdf from 'html2pdf.js'
-import { CONTACTS } from '../config'
 import { formatPrice, calculateSubtotal } from '../utils/formatPrice'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function CartSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [animating, setAnimating] = useState(false)
   const { cartItems, removeFromCart, updateQuantity, clearCart, getTotalPrice, onCartAddRef } = useContext(CartContext)
+  const { contacts } = useSiteData()
 
   useEffect(() => {
     const triggerAnimation = () => {
@@ -127,7 +128,7 @@ export default function CartSidebar() {
         <div style="margin-top: 30px; text-align: center; color: #999; font-size: 12px;">
           <p>Pedido gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
           <p>Entre em contato para confirmar disponibilidade e delivery!</p>
-          <p>WhatsApp: (11) 94575-4150</p>
+          <p>WhatsApp: {contacts.whatsapp.display || contacts.whatsapp.number}</p>
         </div>
       </div>
     `
@@ -303,7 +304,7 @@ export default function CartSidebar() {
             </div>
 
             <a
-              href={`${CONTACTS.whatsapp.link}?text=${encodeURIComponent(buildWhatsAppMessage())}`}
+              href={`${contacts.whatsapp.link}?text=${encodeURIComponent(buildWhatsAppMessage())}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary-light transition-colors shadow-md block text-center cursor-pointer flex items-center justify-center gap-2 min-h-12"

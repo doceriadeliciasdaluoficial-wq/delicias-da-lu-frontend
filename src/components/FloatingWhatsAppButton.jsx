@@ -1,9 +1,9 @@
 import React from 'react'
+import { useSiteData } from '../context/SiteDataContext'
 
 export default function FloatingWhatsAppButton() {
-  const whatsappNumber = '5511945754150'
-  const whatsappMessage = 'Oi Lú! Vim pelo site e quero fazer um pedido!'
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
+  const { contacts } = useSiteData()
+  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`
 
   return (
     <a
