@@ -23,6 +23,10 @@ export const siteDataService = {
         menu: {
           ...this.getDefaultConfig().menu,
           ...(parsed.menu || {}),
+          sectionLabels: {
+            ...this.getDefaultConfig().menu.sectionLabels,
+            ...(parsed.menu?.sectionLabels || {})
+          },
           customSections: parsed?.menu?.customSections || []
         },
         contacts: {

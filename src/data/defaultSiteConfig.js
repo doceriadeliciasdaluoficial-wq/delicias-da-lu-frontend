@@ -59,6 +59,12 @@ export const defaultSiteConfig = {
     docesSimples: clone(menuData.docesSimples || []),
     docesFinos: clone(menuData.docesFinos || []),
     decoracoes: clone(menuData.decoracoes || []),
+    sectionLabels: {
+      bolos: '🍰 Bolos',
+      docesSimples: '🍫 Doces Simples',
+      docesFinos: '✨ Doces Finos',
+      decoracoes: '🎀 Decorações'
+    },
     customSections: []
   },
   contacts: clone(CONTACTS)

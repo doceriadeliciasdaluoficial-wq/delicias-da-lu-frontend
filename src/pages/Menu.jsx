@@ -3,6 +3,7 @@ import { CartContext } from '../context/CartContext'
 import { formatPrice, formatPriceWithUnit } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
 import ProductDetailsModal from '../components/ProductDetailsModal'
+import sortByOrder from '../utils/sortByOrder'
 
 export default function Menu({ setCurrentPage }) {
   const [activeTab, setActiveTab] = useState('bolos')
@@ -10,12 +11,13 @@ export default function Menu({ setCurrentPage }) {
   const [selectedItem, setSelectedItem] = useState(null)
   const { addToCart } = useContext(CartContext)
   const { menuData, contacts } = useSiteData()
-  const customSections = menuData.customSections || []
+  const sectionLabels = menuData.sectionLabels || {}
+  const customSections = sortByOrder(menuData.customSections || [])
   const tabs = [
-    { id: 'bolos', label: '🍰 Bolos' },
-    { id: 'doces_simples', label: '🍫 Doces Simples' },
-    { id: 'doces_finos', label: '✨ Doces Finos' },
-    { id: 'decoracoes', label: '🎀 Decorações' },
+    { id: 'bolos', label: sectionLabels.bolos || '🍰 Bolos' },
+    { id: 'docesSimples', label: sectionLabels.docesSimples || '🍫 Doces Simples' },
+    { id: 'docesFinos', label: sectionLabels.docesFinos || '✨ Doces Finos' },
+    { id: 'decoracoes', label: sectionLabels.decoracoes || '🎀 Decorações' },
     ...customSections.map((section) => ({ id: section.id, label: section.label }))
   ]
 
@@ -89,7 +91,7 @@ export default function Menu({ setCurrentPage }) {
           {/* BOLOS TAB */}
           {activeTab === 'bolos' && (
             <div className="space-y-12">
-              {(menuData.bolos || []).reduce((acc, item) => {
+              {sortByOrder(menuData.bolos || []).reduce((acc, item) => {
                 const categoryExists = acc.find(c => c.category === item.category)
                 if (categoryExists) {
                   categoryExists.items.push(item)
@@ -176,12 +178,12 @@ export default function Menu({ setCurrentPage }) {
           )}
 
           {/* DOCES SIMPLES TAB */}
-          {activeTab === 'doces_simples' && (
+          {activeTab === 'docesSimples' && (
             <div className="space-y-8">
               <div>
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Festa (forminha nº6)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                  {(menuData.docesSimples || [])
+                  {sortByOrder(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Festa (forminha nº6)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
@@ -236,7 +238,7 @@ export default function Menu({ setCurrentPage }) {
               <div>
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Maior (caixinha)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                  {(menuData.docesSimples || [])
+                  {sortByOrder(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Maior (caixinha)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
@@ -292,11 +294,11 @@ export default function Menu({ setCurrentPage }) {
           )}
 
           {/* DOCES FINOS TAB */}
-          {activeTab === 'doces_finos' && (
+          {activeTab === 'docesFinos' && (
             <div>
               <h3 className="font-headline-md text-headline-md text-primary mb-6">Doces Finos (por unidade, mín. 15)</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                {(menuData.docesFinos || []).map((item, i) => (
+                {sortByOrder(menuData.docesFinos || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                     <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl">
                       {item.image ? (
@@ -331,7 +333,7 @@ export default function Menu({ setCurrentPage }) {
               <h3 className="font-headline-md text-headline-md text-primary mb-6">Opções de Decoração</h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-8">Decorações têm valores à parte. Consulte no orçamento.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {(menuData.decoracoes || []).map((item, i) => (
+                {sortByOrder(menuData.decoracoes || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm p-5 sm:p-6">
                     <div className="flex gap-4">
                       <span className="text-5xl flex-shrink-0">
@@ -362,7 +364,7 @@ export default function Menu({ setCurrentPage }) {
               <div key={section.id}>
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">{section.label}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                  {(section.items || []).map((item, i) => (
+                  {sortByOrder(section.items || []).map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                         <button
                           type="button"

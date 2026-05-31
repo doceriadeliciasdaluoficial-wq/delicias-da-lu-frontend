@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { useSiteData } from '../context/SiteDataContext'
+import sortByOrder from '../utils/sortByOrder'
 
 const ADMIN_PATH = '/painel-interno-secreto-lu'
 
@@ -19,22 +20,24 @@ const standardMenuSections = [
   { id: 'decoracoes', label: '🎀 Decorações' }
 ]
 
+const standardMenuSectionIds = standardMenuSections.map((section) => section.id)
+
 const emptyToast = { type: '', message: '' }
 
 const baseCakeDefaults = {
-  fillings: { id: '', label: '', value: '', description: '', image: '' },
-  masses: { id: '', label: '', value: '', description: '', fullDescription: '', image: '' },
-  toppings: { id: '', label: '', value: '', description: '', image: '' },
-  decorations: { id: '', label: '', value: '', description: '', note: '', image: '' },
-  sizes: { id: '', label: '', value: '', weight: '', servings: '', description: '', image: '' }
+  fillings: { id: '', label: '', value: '', order: '', description: '', image: '' },
+  masses: { id: '', label: '', value: '', order: '', description: '', fullDescription: '', image: '' },
+  toppings: { id: '', label: '', value: '', order: '', description: '', image: '' },
+  decorations: { id: '', label: '', value: '', order: '', description: '', note: '', image: '' },
+  sizes: { id: '', label: '', value: '', order: '', weight: '', servings: '', description: '', image: '' }
 }
 
 const baseMenuDefaults = {
-  bolos: { id: '', name: '', category: '', price: '', unit: 'kg', description: '', image: '', customPrice: false },
-  docesSimples: { id: '', name: '', category: '', price: '', unit: 'cento', minQuantity: '', description: '', image: '' },
-  docesFinos: { id: '', name: '', price: '', unit: 'un', minQuantity: '', description: '', image: '' },
-  decoracoes: { id: '', name: '', description: '', note: '', image: '', price: '' },
-  custom: { id: '', name: '', price: '', unit: 'un', minQuantity: '', description: '', image: '', customPrice: false }
+  bolos: { id: '', name: '', category: '', price: '', order: '', unit: 'kg', description: '', image: '', customPrice: false },
+  docesSimples: { id: '', name: '', category: '', price: '', order: '', unit: 'cento', minQuantity: '', description: '', image: '' },
+  docesFinos: { id: '', name: '', price: '', order: '', unit: 'un', minQuantity: '', description: '', image: '' },
+  decoracoes: { id: '', name: '', description: '', note: '', image: '', price: '', order: '' },
+  custom: { id: '', name: '', price: '', order: '', unit: 'un', minQuantity: '', description: '', image: '', customPrice: false }
 }
 
 const baseHomeFeaturedCake = {
@@ -43,6 +46,7 @@ const baseHomeFeaturedCake = {
   defaultWeight: '',
   defaultConfig: '',
   basePrice: '',
+  order: '',
   tag: '',
   image: '',
   description: '',
@@ -54,6 +58,11 @@ const baseHomeFeaturedCake = {
     decoration: ''
   }
 }
+
+const defaultStandardMenuLabels = standardMenuSections.reduce((accumulator, section) => {
+  accumulator[section.id] = section.label
+  return accumulator
+}, {})
 
 const contactEditorBase = {
   whatsapp: {
@@ -99,6 +108,7 @@ const schemaLabels = {
   defaultWeight: 'Peso padrão',
   defaultConfig: 'Configuração padrão',
   basePrice: 'Preço base',
+  order: 'Ordem',
   tag: 'Tag',
   image: 'Imagem',
   customPrice: 'Preço personalizado',
@@ -115,6 +125,95 @@ const schemaLabels = {
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value))
+}
+
+function resequenceItems(items = []) {
+  return sortByOrder(items).map((item, index) => ({
+    ...item,
+    order: index + 1
+  }))
+}
+
+function resequenceItemsInCurrentOrder(items = []) {
+  return items.map((item, index) => ({
+    ...item,
+    order: index + 1
+  }))
+}
+
+function moveItem(items = [], fromIndex, toIndex) {
+  const next = [...items]
+  const [moved] = next.splice(fromIndex, 1)
+  const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex
+  next.splice(Math.max(0, Math.min(adjustedToIndex, next.length)), 0, moved)
+  return next
+}
+
+function saveItemByOrder(existingItems = [], nextItem, editIndex = null) {
+  const baseList = [...existingItems]
+  if (editIndex !== null) {
+    baseList.splice(editIndex, 1)
+  }
+
+  const numericOrder = Number(nextItem?.order)
+  const desiredOrder = Number.isFinite(numericOrder) && numericOrder > 0 ? Math.floor(numericOrder) : baseList.length + 1
+  const insertionIndex = Math.max(0, Math.min(desiredOrder - 1, baseList.length))
+
+  const nextList = [...baseList]
+  nextList.splice(insertionIndex, 0, nextItem)
+  return resequenceItemsInCurrentOrder(nextList)
+}
+
+function normalizeSiteOrders(config) {
+  const next = deepClone(config)
+
+  if (next.cakeBuilder) {
+    cakeSections.forEach((section) => {
+      next.cakeBuilder[section.key] = resequenceItems(next.cakeBuilder[section.key] || [])
+    })
+  }
+
+  if (next.home?.featuredCakes) {
+    next.home.featuredCakes = resequenceItems(next.home.featuredCakes)
+  }
+
+  if (next.menu) {
+    standardMenuSectionIds.forEach((sectionId) => {
+      next.menu[sectionId] = resequenceItems(next.menu[sectionId] || [])
+    })
+
+    next.menu.customSections = resequenceItems(next.menu.customSections || []).map((section, index) => ({
+      ...section,
+      order: index + 1,
+      items: resequenceItems(section.items || [])
+    }))
+  }
+
+  return next
+}
+
+function formatBrazilianPhone(value) {
+  const digits = String(value || '').replace(/\D/g, '')
+  if (!digits) return ''
+
+  const hasCountryCode = digits.startsWith('55') && digits.length > 11
+  const localDigits = hasCountryCode ? digits.slice(2) : digits
+  const ddd = localDigits.slice(0, 2)
+  const subscriber = localDigits.slice(2)
+
+  if (subscriber.length <= 4) {
+    return hasCountryCode ? `+55 (${ddd}) ${subscriber}`.trim() : `(${ddd}) ${subscriber}`.trim()
+  }
+
+  const firstPart = subscriber.length === 8 ? subscriber.slice(0, 4) : subscriber.slice(0, 5)
+  const secondPart = subscriber.length === 8 ? subscriber.slice(4, 8) : subscriber.slice(5, 9)
+  const formatted = `(${ddd}) ${firstPart}-${secondPart}`.trim()
+
+  return hasCountryCode ? `+55 ${formatted}` : formatted
+}
+
+function sanitizeBrazilianPhoneInput(value) {
+  return String(value || '').replace(/\D/g, '')
 }
 
 function createId(prefix = 'item') {
@@ -214,6 +313,7 @@ function getCakeSchema(sectionKey, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'label', type: 'text', label: 'Rótulo' },
       { path: 'value', type: 'number', label: 'Valor', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'image', type: 'image', label: 'Imagem' }
     ],
@@ -221,6 +321,7 @@ function getCakeSchema(sectionKey, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'label', type: 'text', label: 'Rótulo' },
       { path: 'value', type: 'number', label: 'Valor', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'fullDescription', type: 'textarea', label: 'Descrição completa' },
       { path: 'image', type: 'image', label: 'Imagem' }
@@ -229,6 +330,7 @@ function getCakeSchema(sectionKey, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'label', type: 'text', label: 'Rótulo' },
       { path: 'value', type: 'number', label: 'Valor', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'image', type: 'image', label: 'Imagem' }
     ],
@@ -236,6 +338,7 @@ function getCakeSchema(sectionKey, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'label', type: 'text', label: 'Rótulo' },
       { path: 'value', type: 'number', label: 'Valor', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'note', type: 'textarea', label: 'Observação' },
       { path: 'image', type: 'image', label: 'Imagem' }
@@ -244,6 +347,7 @@ function getCakeSchema(sectionKey, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'label', type: 'text', label: 'Rótulo' },
       { path: 'value', type: 'number', label: 'Valor', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'weight', type: 'text', label: 'Peso' },
       { path: 'servings', type: 'text', label: 'Porções' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
@@ -261,6 +365,7 @@ function getMenuSchema(sectionId, cakeBuilder) {
       { path: 'name', type: 'text', label: 'Nome' },
       { path: 'category', type: 'text', label: 'Categoria' },
       { path: 'price', type: 'number', label: 'Preço', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'unit', type: 'text', label: 'Unidade' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'image', type: 'image', label: 'Imagem' },
@@ -271,6 +376,7 @@ function getMenuSchema(sectionId, cakeBuilder) {
       { path: 'name', type: 'text', label: 'Nome' },
       { path: 'category', type: 'text', label: 'Categoria' },
       { path: 'price', type: 'number', label: 'Preço', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'unit', type: 'text', label: 'Unidade' },
       { path: 'minQuantity', type: 'number', label: 'Qtd. mínima', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
@@ -280,6 +386,7 @@ function getMenuSchema(sectionId, cakeBuilder) {
       { path: 'id', type: 'text', label: 'ID' },
       { path: 'name', type: 'text', label: 'Nome' },
       { path: 'price', type: 'number', label: 'Preço', step: '0.01' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'unit', type: 'text', label: 'Unidade' },
       { path: 'minQuantity', type: 'number', label: 'Qtd. mínima', step: '1' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
@@ -290,6 +397,7 @@ function getMenuSchema(sectionId, cakeBuilder) {
       { path: 'name', type: 'text', label: 'Nome' },
       { path: 'description', type: 'textarea', label: 'Descrição' },
       { path: 'note', type: 'textarea', label: 'Observação' },
+      { path: 'order', type: 'number', label: 'Ordem', step: '1' },
       { path: 'image', type: 'image', label: 'Imagem' },
       { path: 'price', type: 'number', label: 'Preço', step: '0.01' }
     ]
@@ -309,6 +417,10 @@ function getMenuSchema(sectionId, cakeBuilder) {
   ]
 }
 
+function getStandardMenuLabel(sectionId, sectionLabels = {}) {
+  return sectionLabels[sectionId] || defaultStandardMenuLabels[sectionId] || sectionId
+}
+
 function getHomeSchema(cakeBuilder) {
   return [
     { path: 'id', type: 'text', label: 'ID' },
@@ -316,6 +428,7 @@ function getHomeSchema(cakeBuilder) {
     { path: 'defaultWeight', type: 'text', label: 'Peso padrão' },
     { path: 'defaultConfig', type: 'text', label: 'Configuração padrão' },
     { path: 'basePrice', type: 'number', label: 'Preço base', step: '0.01' },
+    { path: 'order', type: 'number', label: 'Ordem', step: '1' },
     { path: 'tag', type: 'text', label: 'Tag' },
     { path: 'description', type: 'textarea', label: 'Descrição' },
     { path: 'image', type: 'image', label: 'Imagem' },
@@ -447,8 +560,8 @@ function FormField({ field, value, onChange }) {
       <input
         type={field.type === 'number' ? 'number' : 'text'}
         step={field.step || (field.type === 'number' ? '0.01' : '1')}
-        value={value ?? ''}
-        onChange={(event) => onChange(field.path, event.target.value)}
+        value={field.path === 'whatsapp.number' ? formatBrazilianPhone(value) : (value ?? '')}
+        onChange={(event) => onChange(field.path, field.path === 'whatsapp.number' ? sanitizeBrazilianPhoneInput(event.target.value) : event.target.value)}
         className="w-full border border-outline-variant rounded-lg px-3 py-2 bg-surface"
       />
     </label>
@@ -492,7 +605,15 @@ function EditorModal({ open, title, subtitle, schema, item, onChange, onClose, o
   )
 }
 
-function SectionList({ title, items, onEdit, onDelete, onAdd, addLabel = 'Novo item', onEditSection, onDeleteSection, sectionEditable = false }) {
+function SectionList({ title, items, onEdit, onDelete, onAdd, addLabel = 'Novo item', onEditSection, onDeleteSection, onReorder }) {
+  const [draggedIndex, setDraggedIndex] = useState(null)
+
+  const handleDrop = (dropIndex) => {
+    if (draggedIndex === null || draggedIndex === dropIndex || !onReorder) return
+    onReorder(draggedIndex, dropIndex)
+    setDraggedIndex(null)
+  }
+
   return (
     <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden">
       <div className="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -501,15 +622,15 @@ function SectionList({ title, items, onEdit, onDelete, onAdd, addLabel = 'Novo i
           <span className="text-sm text-on-surface-variant">{items.length} itens</span>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {sectionEditable && (
-            <>
-              <button type="button" className="px-3 py-2 rounded-lg bg-surface-container border border-outline-variant text-sm" onClick={onEditSection}>
-                Editar seção
-              </button>
-              <button type="button" className="px-3 py-2 rounded-lg bg-error/10 text-error border border-error/20 text-sm" onClick={onDeleteSection}>
-                Excluir seção
-              </button>
-            </>
+          {onEditSection && (
+            <button type="button" className="px-3 py-2 rounded-lg bg-surface-container border border-outline-variant text-sm" onClick={onEditSection}>
+              Editar seção
+            </button>
+          )}
+          {onDeleteSection && (
+            <button type="button" className="px-3 py-2 rounded-lg bg-error/10 text-error border border-error/20 text-sm" onClick={onDeleteSection}>
+              Excluir seção
+            </button>
           )}
           {onAdd && (
             <button type="button" className="px-3 py-2 rounded-lg bg-primary text-white text-sm" onClick={onAdd}>
@@ -521,10 +642,27 @@ function SectionList({ title, items, onEdit, onDelete, onAdd, addLabel = 'Novo i
       <div className="max-h-[440px] overflow-auto">
         {items.length === 0 && <p className="p-4 text-sm text-on-surface-variant">Sem itens nesta seção.</p>}
         {items.map((item, index) => (
-          <div key={item.id || `${item.name || item.label}-${index}`} className="p-4 border-b border-outline-variant/70 last:border-b-0 flex flex-col sm:flex-row sm:justify-between gap-3">
+          <div
+            key={item.id || `${item.name || item.label}-${index}`}
+            draggable={Boolean(onReorder)}
+            onDragStart={() => setDraggedIndex(index)}
+            onDragOver={(event) => {
+              if (!onReorder) return
+              event.preventDefault()
+            }}
+            onDrop={() => handleDrop(index)}
+            onDragEnd={() => setDraggedIndex(null)}
+            className={`p-4 border-b border-outline-variant/70 last:border-b-0 flex flex-col sm:flex-row sm:justify-between gap-3 ${onReorder ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedIndex === index ? 'bg-primary/5' : ''}`}
+          >
             <div className="min-w-0">
-              <p className="font-medium text-on-surface truncate">{item.name || item.label || item.id}</p>
+              <div className="flex items-center gap-2 min-w-0">
+                {onReorder && <span className="text-on-surface-variant flex-shrink-0">⋮⋮</span>}
+                <p className="font-medium text-on-surface truncate">{item.name || item.label || item.id}</p>
+              </div>
               <p className="text-xs text-on-surface-variant truncate">ID: {item.id || 'sem-id'}</p>
+              {item.order !== undefined && item.order !== '' && (
+                <p className="text-xs text-on-surface-variant truncate">Ordem: {item.order}</p>
+              )}
             </div>
             <div className="flex gap-2 flex-wrap flex-shrink-0">
               <button type="button" className="px-3 py-1.5 rounded-lg bg-surface-container border border-outline-variant text-sm" onClick={() => onEdit(index)}>
@@ -555,6 +693,7 @@ export default function AdminPanel({ onExit }) {
   const [selectedMenuSection, setSelectedMenuSection] = useState('bolos')
 
   const [editor, setEditor] = useState(null)
+  const hasNormalizedOrdersRef = useRef(false)
 
   useEffect(() => {
     if (!toast.message) return undefined
@@ -562,22 +701,39 @@ export default function AdminPanel({ onExit }) {
     return () => clearTimeout(timeout)
   }, [toast])
 
+  useEffect(() => {
+    if (!isAuthenticated || hasNormalizedOrdersRef.current) return
+    const normalized = normalizeSiteOrders(siteConfig)
+    if (JSON.stringify(normalized) !== JSON.stringify(siteConfig)) {
+      updateSiteConfig(normalized)
+    }
+    hasNormalizedOrdersRef.current = true
+  }, [isAuthenticated, siteConfig, updateSiteConfig])
+
   const customMenuSections = menuData.customSections || []
+  const sectionLabels = menuData.sectionLabels || {}
 
   const menuSections = useMemo(() => {
-    const custom = customMenuSections.map((section) => ({
+    const standard = standardMenuSections.map((section) => ({
+      id: section.id,
+      label: getStandardMenuLabel(section.id, sectionLabels),
+      items: menuData[section.id] || [],
+      custom: false
+    }))
+
+    const custom = sortByOrder(customMenuSections).map((section) => ({
       id: section.id,
       label: section.label,
       items: section.items || [],
       custom: true
     }))
 
-    return [...standardMenuSections, ...custom]
-  }, [customMenuSections])
+    return [...standard, ...custom]
+  }, [customMenuSections, menuData, sectionLabels])
 
-  const currentCakeItems = cakeBuilder[selectedCakeSection] || []
+  const currentCakeItems = sortByOrder(cakeBuilder[selectedCakeSection] || [])
   const currentMenuSection = menuSections.find((section) => section.id === selectedMenuSection)
-  const homeFeatured = siteConfig.home?.featuredCakes || []
+  const homeFeatured = sortByOrder(siteConfig.home?.featuredCakes || [])
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type })
@@ -596,13 +752,160 @@ export default function AdminPanel({ onExit }) {
     }))
   }
 
+  const getMenuSectionById = (sectionId) => menuSections.find((section) => section.id === sectionId)
+
+  const getMenuItemsBySectionId = (sectionId) => {
+    if (standardMenuSectionIds.includes(sectionId)) {
+      return menuData[sectionId] || []
+    }
+
+    return getMenuSectionById(sectionId)?.items || []
+  }
+
+  const reorderCakeItems = (sectionKey, fromIndex, toIndex) => {
+    updateSiteConfig((current) => {
+      const next = deepClone(current)
+      const list = sortByOrder(next.cakeBuilder[sectionKey] || [])
+      next.cakeBuilder[sectionKey] = resequenceItemsInCurrentOrder(moveItem(list, fromIndex, toIndex))
+      return next
+    })
+  }
+
+  const reorderHomeItems = (fromIndex, toIndex) => {
+    updateSiteConfig((current) => {
+      const next = deepClone(current)
+      const list = sortByOrder(next.home?.featuredCakes || [])
+      next.home = next.home || {}
+      next.home.featuredCakes = resequenceItemsInCurrentOrder(moveItem(list, fromIndex, toIndex))
+      return next
+    })
+  }
+
+  const reorderMenuItems = (sectionId, fromIndex, toIndex) => {
+    updateSiteConfig((current) => {
+      const next = deepClone(current)
+
+      if (standardMenuSectionIds.includes(sectionId)) {
+        const list = sortByOrder(next.menu[sectionId] || [])
+        next.menu[sectionId] = resequenceItemsInCurrentOrder(moveItem(list, fromIndex, toIndex))
+        return next
+      }
+
+      next.menu.customSections = (next.menu.customSections || []).map((section) => {
+        if (section.id !== sectionId) return section
+        const list = sortByOrder(section.items || [])
+        return { ...section, items: resequenceItemsInCurrentOrder(moveItem(list, fromIndex, toIndex)) }
+      })
+
+      return next
+    })
+  }
+
+  const beginCreateMenuItemForSection = (sectionId) => {
+    const section = getMenuSectionById(sectionId)
+    openEditor({
+      kind: 'menu',
+      sectionKey: sectionId,
+      index: null,
+      title: `Novo item em ${section?.label || 'Cardápio'}`,
+      item: { ...getBaseMenuItem(sectionId), order: String(getMenuItemsBySectionId(sectionId).length + 1) },
+      schema: getMenuSchema(sectionId, cakeBuilder),
+      saveLabel: 'Salvar item'
+    })
+  }
+
+  const beginEditMenuItemForSection = (sectionId, index) => {
+    const section = getMenuSectionById(sectionId)
+    const item = deepClone(getMenuItemsBySectionId(sectionId)[index] || {})
+    openEditor({
+      kind: 'menu',
+      sectionKey: sectionId,
+      index,
+      title: `Editar item de ${section?.label || 'Cardápio'}`,
+      item,
+      schema: getMenuSchema(sectionId, cakeBuilder),
+      saveLabel: 'Salvar alterações'
+    })
+  }
+
+  const beginEditMenuSectionById = (sectionId) => {
+    const section = getMenuSectionById(sectionId)
+    if (!section) return
+
+    if (!section.custom) {
+      openEditor({
+        kind: 'menu-label',
+        sectionKey: sectionId,
+        title: `Editar nome de ${section.label}`,
+        item: { label: section.label },
+        schema: [{ path: 'label', type: 'text', label: 'Nome exibido' }],
+        saveLabel: 'Salvar nome'
+      })
+      return
+    }
+
+    openEditor({
+      kind: 'menu-section',
+      sectionKey: sectionId,
+      originalId: sectionId,
+      index: null,
+      title: 'Editar seção de cardápio',
+      item: { id: section.id, label: section.label },
+      schema: [
+        { path: 'id', type: 'text', label: 'ID da seção' },
+        { path: 'label', type: 'text', label: 'Nome da seção' }
+      ],
+      saveLabel: 'Salvar seção'
+    })
+  }
+
+  const deleteCustomSectionById = (sectionId) => {
+    const section = getMenuSectionById(sectionId)
+    if (!section?.custom) return
+    if (!confirmDelete('Tem certeza que deseja excluir esta seção e todos os itens dela?')) return
+
+    updateSiteConfig((current) => {
+      const next = deepClone(current)
+      next.menu.customSections = (next.menu.customSections || []).filter((customSection) => customSection.id !== sectionId)
+      return next
+    })
+
+    if (selectedMenuSection === sectionId) {
+      setSelectedMenuSection('bolos')
+    }
+
+    showToast('Seção excluída com sucesso.')
+  }
+
+  const deleteMenuItemForSection = (sectionId, index) => {
+    if (!confirmDelete('Tem certeza que deseja excluir este item do cardápio?')) return
+
+    updateSiteConfig((current) => {
+      const next = deepClone(current)
+
+      if (standardMenuSectionIds.includes(sectionId)) {
+        next.menu[sectionId] = (next.menu[sectionId] || []).filter((_, currentIndex) => currentIndex !== index)
+        return next
+      }
+
+      next.menu.customSections = (next.menu.customSections || []).map((section) => (
+        section.id === sectionId
+          ? { ...section, items: (section.items || []).filter((_, currentIndex) => currentIndex !== index) }
+          : section
+      ))
+      return next
+    })
+
+    showToast('Item excluído com sucesso.')
+  }
+
   const beginCreateCakeItem = () => {
     openEditor({
       kind: 'cake',
       sectionKey: selectedCakeSection,
       index: null,
       title: `Novo item em ${cakeSections.find((section) => section.key === selectedCakeSection)?.label || 'Cake Builder'}`,
-      item: getBaseCakeItem(selectedCakeSection),
+      item: { ...getBaseCakeItem(selectedCakeSection), order: String(currentCakeItems.length + 1) },
       schema: getCakeSchema(selectedCakeSection, cakeBuilder),
       saveLabel: 'Salvar item'
     })
@@ -627,7 +930,7 @@ export default function AdminPanel({ onExit }) {
       sectionKey: selectedMenuSection,
       index: null,
       title: `Novo item em ${currentMenuSection?.label || 'Cardápio'}`,
-      item: getBaseMenuItem(selectedMenuSection),
+      item: { ...getBaseMenuItem(selectedMenuSection), order: String(getMenuItemsBySectionId(selectedMenuSection).length + 1) },
       schema: getMenuSchema(selectedMenuSection, cakeBuilder),
       saveLabel: 'Salvar item'
     })
@@ -652,10 +955,11 @@ export default function AdminPanel({ onExit }) {
       sectionKey: null,
       index: null,
       title: 'Nova seção de cardápio',
-      item: { id: '', label: '' },
+      item: { id: '', label: '', order: String(customMenuSections.length + 1) },
       schema: [
         { path: 'id', type: 'text', label: 'ID da seção' },
-        { path: 'label', type: 'text', label: 'Nome da seção' }
+        { path: 'label', type: 'text', label: 'Nome da seção' },
+        { path: 'order', type: 'number', label: 'Ordem', step: '1' }
       ],
       saveLabel: 'Criar seção'
     })
@@ -669,10 +973,11 @@ export default function AdminPanel({ onExit }) {
       originalId: selectedMenuSection,
       index: null,
       title: 'Editar seção de cardápio',
-      item: { id: currentMenuSection.id, label: currentMenuSection.label },
+      item: { id: currentMenuSection.id, label: currentMenuSection.label, order: currentMenuSection.order || '' },
       schema: [
         { path: 'id', type: 'text', label: 'ID da seção' },
-        { path: 'label', type: 'text', label: 'Nome da seção' }
+        { path: 'label', type: 'text', label: 'Nome da seção' },
+        { path: 'order', type: 'number', label: 'Ordem', step: '1' }
       ],
       saveLabel: 'Salvar seção'
     })
@@ -683,7 +988,7 @@ export default function AdminPanel({ onExit }) {
       kind: 'home',
       index: null,
       title: 'Novo destaque da Home',
-      item: getBaseHomeItem(),
+      item: { ...getBaseHomeItem(), order: String(homeFeatured.length + 1) },
       schema: getHomeSchema(cakeBuilder),
       saveLabel: 'Salvar destaque'
     })
@@ -719,15 +1024,7 @@ export default function AdminPanel({ onExit }) {
       const normalized = normalizeNumbers(editor.item)
       updateSiteConfig((current) => {
         const next = deepClone(current)
-        const list = [...(next.cakeBuilder[editor.sectionKey] || [])]
-
-        if (editor.index === null) {
-          list.push(normalized)
-        } else {
-          list[editor.index] = normalized
-        }
-
-        next.cakeBuilder[editor.sectionKey] = list
+        next.cakeBuilder[editor.sectionKey] = saveItemByOrder(next.cakeBuilder[editor.sectionKey] || [], normalized, editor.index)
         return next
       })
       showToast('Item do Cake Builder salvo com sucesso.')
@@ -739,22 +1036,16 @@ export default function AdminPanel({ onExit }) {
       const normalized = normalizeNumbers(editor.item)
       updateSiteConfig((current) => {
         const next = deepClone(current)
-        const standardIds = standardMenuSections.map((section) => section.id)
+        const standardIds = standardMenuSectionIds
 
         if (standardIds.includes(editor.sectionKey)) {
-          const list = [...(next.menu[editor.sectionKey] || [])]
-          if (editor.index === null) list.push(normalized)
-          else list[editor.index] = normalized
-          next.menu[editor.sectionKey] = list
+          next.menu[editor.sectionKey] = saveItemByOrder(next.menu[editor.sectionKey] || [], normalized, editor.index)
           return next
         }
 
         next.menu.customSections = (next.menu.customSections || []).map((section) => {
           if (section.id !== editor.sectionKey) return section
-          const list = [...(section.items || [])]
-          if (editor.index === null) list.push(normalized)
-          else list[editor.index] = normalized
-          return { ...section, items: list }
+          return { ...section, items: saveItemByOrder(section.items || [], normalized, editor.index) }
         })
 
         return next
@@ -771,11 +1062,12 @@ export default function AdminPanel({ onExit }) {
         const originalId = editor.originalId || editor.sectionKey
         const nextId = String(editor.item.id || '').trim()
         const nextLabel = String(editor.item.label || '').trim()
+        const nextOrder = String(editor.item.order || '').trim()
 
         if (!nextId || !nextLabel) return current
 
         const existingIndex = customSections.findIndex((section) => section.id === originalId)
-        const payload = { id: nextId, label: nextLabel, items: existingIndex >= 0 ? customSections[existingIndex].items || [] : [] }
+        const payload = { id: nextId, label: nextLabel, order: nextOrder, items: existingIndex >= 0 ? customSections[existingIndex].items || [] : [] }
 
         if (existingIndex >= 0) {
           customSections[existingIndex] = payload
@@ -783,7 +1075,10 @@ export default function AdminPanel({ onExit }) {
           customSections.push(payload)
         }
 
-        next.menu.customSections = customSections
+        next.menu.customSections = resequenceItems(sortByOrder(customSections).map((section) => ({
+          ...section,
+          items: resequenceItems(section.items || [])
+        })))
         return next
       })
       setSelectedMenuSection(String(editor.item.id || '').trim())
@@ -792,20 +1087,29 @@ export default function AdminPanel({ onExit }) {
       return
     }
 
+    if (editor.kind === 'menu-label') {
+      const nextLabel = String(editor.item.label || '').trim()
+      if (!nextLabel) return
+
+      updateSiteConfig((current) => {
+        const next = deepClone(current)
+        next.menu.sectionLabels = {
+          ...(next.menu.sectionLabels || {}),
+          [editor.sectionKey]: nextLabel
+        }
+        return next
+      })
+      showToast('Nome do cardápio salvo com sucesso.')
+      closeEditor()
+      return
+    }
+
     if (editor.kind === 'home') {
       const normalized = normalizeNumbers(editor.item)
       updateSiteConfig((current) => {
         const next = deepClone(current)
-        const list = [...(next.home?.featuredCakes || [])]
         next.home = next.home || {}
-
-        if (editor.index === null) {
-          list.push(normalized)
-        } else {
-          list[editor.index] = normalized
-        }
-
-        next.home.featuredCakes = list
+        next.home.featuredCakes = saveItemByOrder(next.home.featuredCakes || [], normalized, editor.index)
         return next
       })
       showToast('Destaque da Home salvo com sucesso.')
@@ -832,7 +1136,7 @@ export default function AdminPanel({ onExit }) {
     if (!confirmDelete('Tem certeza que deseja excluir este item do Cake Builder?')) return
     updateSiteConfig((current) => {
       const next = deepClone(current)
-      next.cakeBuilder[selectedCakeSection] = (next.cakeBuilder[selectedCakeSection] || []).filter((_, currentIndex) => currentIndex !== index)
+      next.cakeBuilder[selectedCakeSection] = resequenceItems((next.cakeBuilder[selectedCakeSection] || []).filter((_, currentIndex) => currentIndex !== index))
       return next
     })
     showToast('Item excluído com sucesso.')
@@ -845,13 +1149,13 @@ export default function AdminPanel({ onExit }) {
       const standardIds = standardMenuSections.map((section) => section.id)
 
       if (standardIds.includes(selectedMenuSection)) {
-        next.menu[selectedMenuSection] = (next.menu[selectedMenuSection] || []).filter((_, currentIndex) => currentIndex !== index)
+        next.menu[selectedMenuSection] = resequenceItems((next.menu[selectedMenuSection] || []).filter((_, currentIndex) => currentIndex !== index))
         return next
       }
 
       next.menu.customSections = (next.menu.customSections || []).map((section) => (
         section.id === selectedMenuSection
-          ? { ...section, items: (section.items || []).filter((_, currentIndex) => currentIndex !== index) }
+          ? { ...section, items: resequenceItems((section.items || []).filter((_, currentIndex) => currentIndex !== index)) }
           : section
       ))
       return next
@@ -864,7 +1168,7 @@ export default function AdminPanel({ onExit }) {
     updateSiteConfig((current) => {
       const next = deepClone(current)
       next.home = next.home || {}
-      next.home.featuredCakes = (next.home.featuredCakes || []).filter((_, currentIndex) => currentIndex !== index)
+      next.home.featuredCakes = resequenceItems((next.home.featuredCakes || []).filter((_, currentIndex) => currentIndex !== index))
       return next
     })
     showToast('Destaque excluído com sucesso.')
@@ -875,7 +1179,7 @@ export default function AdminPanel({ onExit }) {
     if (!confirmDelete('Tem certeza que deseja excluir esta seção e todos os itens dela?')) return
     updateSiteConfig((current) => {
       const next = deepClone(current)
-      next.menu.customSections = (next.menu.customSections || []).filter((section) => section.id !== selectedMenuSection)
+      next.menu.customSections = resequenceItems((next.menu.customSections || []).filter((section) => section.id !== selectedMenuSection))
       return next
     })
     setSelectedMenuSection('bolos')
@@ -1009,6 +1313,7 @@ export default function AdminPanel({ onExit }) {
                 onDelete={deleteCakeItem}
                 onAdd={beginCreateCakeItem}
                 addLabel="Novo item"
+                onReorder={(fromIndex, toIndex) => reorderCakeItems(selectedCakeSection, fromIndex, toIndex)}
               />
             </div>
 
@@ -1023,56 +1328,41 @@ export default function AdminPanel({ onExit }) {
 
         {activeTab === 'menu' && (
           <section className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 items-start">
-            <div className="space-y-4">
+            <div className="space-y-4 lg:col-span-2">
               <div className="bg-surface rounded-xl border border-outline-variant p-4 space-y-3">
-                <label className="text-sm text-on-surface-variant">Seção do cardápio</label>
-                <select
-                  className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 bg-background"
-                  value={selectedMenuSection}
-                  onChange={(event) => setSelectedMenuSection(event.target.value)}
-                >
-                  {menuSections.map((section) => (
-                    <option key={section.id} value={section.id}>{section.label}</option>
-                  ))}
-                </select>
-
-                <div className="flex gap-2 flex-wrap">
-                  <button type="button" className="px-3 py-2 rounded-lg bg-primary text-white text-sm" onClick={beginCreateMenuItem}>
-                    Novo item
-                  </button>
-                  <button type="button" className="px-3 py-2 rounded-lg bg-surface-container border border-outline-variant text-sm" onClick={beginCreateMenuSection}>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <label className="text-sm text-on-surface-variant">Cardápios</label>
+                    <p className="text-xs text-on-surface-variant mt-1">Todos os cardápios ficam nesta lista, na ordem que você definir.</p>
+                  </div>
+                  <button type="button" className="px-3 py-2 rounded-lg bg-primary text-white text-sm" onClick={beginCreateMenuSection}>
                     Nova seção
                   </button>
-                  {currentMenuSection?.custom && (
-                    <>
-                      <button type="button" className="px-3 py-2 rounded-lg bg-surface-container border border-outline-variant text-sm" onClick={beginEditMenuSection}>
-                        Editar seção
-                      </button>
-                      <button type="button" className="px-3 py-2 rounded-lg bg-error/10 text-error border border-error/20 text-sm" onClick={deleteCustomSection}>
-                        Excluir seção
-                      </button>
-                    </>
-                  )}
                 </div>
               </div>
 
-              <SectionList
-                title={currentMenuSection?.label || 'Itens'}
-                items={currentMenuSection?.items || []}
-                onEdit={beginEditMenuItem}
-                onDelete={deleteMenuItem}
-                onAdd={beginCreateMenuItem}
-                addLabel="Novo item"
-                sectionEditable={Boolean(currentMenuSection?.custom)}
-                onEditSection={beginEditMenuSection}
-                onDeleteSection={deleteCustomSection}
-              />
+              <div className="space-y-4">
+                {menuSections.map((section) => (
+                  <SectionList
+                    key={section.id}
+                    title={section.label}
+                    items={sortByOrder(section.items || [])}
+                    onEdit={(index) => beginEditMenuItemForSection(section.id, index)}
+                    onDelete={(index) => deleteMenuItemForSection(section.id, index)}
+                    onAdd={() => beginCreateMenuItemForSection(section.id)}
+                    addLabel="Novo item"
+                    onEditSection={() => beginEditMenuSectionById(section.id)}
+                    onDeleteSection={section.custom ? () => deleteCustomSectionById(section.id) : undefined}
+                    onReorder={(fromIndex, toIndex) => reorderMenuItems(section.id, fromIndex, toIndex)}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="bg-surface rounded-xl border border-outline-variant p-4">
-              <p className="font-semibold text-on-surface mb-2">Cardápios adicionais</p>
+              <p className="font-semibold text-on-surface mb-2">Gestão única</p>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                Use <span className="font-semibold">Nova seção</span> para criar cardápios como tortas, salgados ou qualquer outra categoria. As seções criadas aparecem automaticamente no site público.
+                Os cardápios padrão e os criados depois são tratados no mesmo fluxo. Cada seção pode ser renomeada, receber novos itens e ter a ordem ajustada individualmente no editor.
               </p>
             </div>
           </section>
@@ -1088,6 +1378,7 @@ export default function AdminPanel({ onExit }) {
                 onDelete={deleteHomeItem}
                 onAdd={beginCreateHomeItem}
                 addLabel="Novo destaque"
+                onReorder={reorderHomeItems}
               />
             </div>
 
@@ -1111,7 +1402,7 @@ export default function AdminPanel({ onExit }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">WhatsApp</p>
-                  <p className="font-medium text-on-surface break-words">{contacts.whatsapp.display || contacts.whatsapp.number}</p>
+                  <p className="font-medium text-on-surface break-words">{contacts.whatsapp.display || formatBrazilianPhone(contacts.whatsapp.number)}</p>
                 </div>
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">Email</p>

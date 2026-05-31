@@ -3,6 +3,7 @@ import { CartContext } from '../context/CartContext'
 import { formatPrice } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
 import ProductDetailsModal from '../components/ProductDetailsModal'
+import sortByOrder from '../utils/sortByOrder'
 
 export default function Home({ setCurrentPage }) {
   const { addToCart } = useContext(CartContext)
@@ -10,7 +11,7 @@ export default function Home({ setCurrentPage }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [selectedCake, setSelectedCake] = useState(null)
   const touchStartRef = useRef({ x: 0, y: 0 })
-  const featuredCakes = siteConfig.home?.featuredCakes || []
+  const featuredCakes = sortByOrder(siteConfig.home?.featuredCakes || [])
 
   // Auto-advance carousel every 4 seconds on desktop, 5 on mobile
   useEffect(() => {

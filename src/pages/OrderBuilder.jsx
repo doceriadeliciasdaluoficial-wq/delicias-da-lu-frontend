@@ -5,6 +5,7 @@ import { PrimaryButton, SecondaryButton, TertiaryButton } from '../components/Bu
 import { actionButtonContainer } from '../styles/buttonClasses'
 import { useSiteData } from '../context/SiteDataContext'
 import ProductDetailsModal from '../components/ProductDetailsModal'
+import sortByOrder from '../utils/sortByOrder'
 
 export default function OrderBuilder({ setCurrentPage }) {
   const [step, setStep] = useState(0)
@@ -24,7 +25,7 @@ export default function OrderBuilder({ setCurrentPage }) {
   const CAKE_BUILDER = cakeBuilder
 
   const steps = ['Recheio', 'Massa', 'Cobertura', 'Decoração', 'Tamanho', 'Resumo']
-  const options = [CAKE_BUILDER.fillings, CAKE_BUILDER.masses, CAKE_BUILDER.toppings, CAKE_BUILDER.decorations, CAKE_BUILDER.sizes, []]
+  const options = [sortByOrder(CAKE_BUILDER.fillings), sortByOrder(CAKE_BUILDER.masses), sortByOrder(CAKE_BUILDER.toppings), sortByOrder(CAKE_BUILDER.decorations), sortByOrder(CAKE_BUILDER.sizes), []]
   const optionKeys = ['filling', 'mass', 'topping', 'decoration', 'size', null]
   const selectedPrimaryFilling = CAKE_BUILDER.fillings.find(f => f.id === order.filling)
   const selectedSecondaryFilling = CAKE_BUILDER.fillings.find(f => f.id === order.secondaryFilling)
