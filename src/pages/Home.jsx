@@ -1,12 +1,15 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import { CartContext } from '../context/CartContext'
 import { formatPrice } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
+import ProductDetailsModal from '../components/ProductDetailsModal'
 
 export default function Home({ setCurrentPage }) {
   const { addToCart } = useContext(CartContext)
   const { cakeBuilder, contacts, siteConfig } = useSiteData()
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [selectedCake, setSelectedCake] = useState(null)
+  const touchStartRef = useRef({ x: 0, y: 0 })
   const featuredCakes = siteConfig.home?.featuredCakes || []
 
   // Auto-advance carousel every 4 seconds on desktop, 5 on mobile
@@ -44,6 +47,29 @@ export default function Home({ setCurrentPage }) {
         decoration: cakeBuilder.decorations.find(d => d.id === cake.config.decoration)?.label
       }
     })
+  }
+
+  const openCakeDetails = (cake) => setSelectedCake(cake)
+
+  const closeCakeDetails = () => setSelectedCake(null)
+
+  const handleCarouselTouchStart = (event) => {
+    const touch = event.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleCarouselTouchEnd = (event) => {
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - touchStartRef.current.x
+    const deltaY = touch.clientY - touchStartRef.current.y
+
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return
+
+    if (deltaX < 0) {
+      setCurrentSlide((prev) => (prev + 1) % featuredCakes.length)
+    } else {
+      setCurrentSlide((prev) => (prev - 1 + featuredCakes.length) % featuredCakes.length)
+    }
   }
 
   return (
@@ -111,7 +137,7 @@ export default function Home({ setCurrentPage }) {
                 key={i}
                 className="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.05)] border border-outline-variant overflow-hidden group hover:shadow-[0_8px_24px_rgba(62,31,13,0.1)] transition-shadow"
               >
-                <div className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden">
+                <button type="button" onClick={() => openCakeDetails(cake)} className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden text-left">
                   {cake.image ? (
                     <img 
                       src={cake.image} 
@@ -127,13 +153,22 @@ export default function Home({ setCurrentPage }) {
                       </span>
                     </div>
                   )}
-                </div>
+                </button>
                 <div className="p-6 flex flex-col gap-3">
-                  <h3 className="font-headline-md text-headline-md text-on-surface">{cake.name}</h3>
+                  <button type="button" onClick={() => openCakeDetails(cake)} className="text-left">
+                    <h3 className="font-headline-md text-headline-md text-on-surface">{cake.name}</h3>
+                  </button>
                   <div className="font-label-md text-label-md text-on-surface-variant bg-tertiary/10 p-2 rounded">
                     <p className="font-bold text-tertiary">{cake.defaultWeight} - {cake.defaultConfig}</p>
                   </div>
                   <p className="font-body-md text-body-md text-on-surface-variant">{cake.description}</p>
+                  <button
+                    type="button"
+                    onClick={() => openCakeDetails(cake)}
+                    className="w-full py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors"
+                  >
+                    Ler mais
+                  </button>
                   <div className="mt-4 flex justify-between items-center">
                     <span className="font-label-md text-label-md text-primary font-bold">{formatPrice(cake.basePrice)}</span>
                   </div>
@@ -150,12 +185,16 @@ export default function Home({ setCurrentPage }) {
 
               {/* Mobile Carousel */}
               <div className="md:hidden relative -mx-2 sm:mx-0">
-                <div className="overflow-hidden rounded-xl">
+                <div
+                  className="overflow-hidden rounded-xl touch-pan-y"
+                  onTouchStart={handleCarouselTouchStart}
+                  onTouchEnd={handleCarouselTouchEnd}
+                >
                   <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
                     {featuredCakes.map((cake, i) => (
                   <div key={i} className="w-full flex-shrink-0">
                     <div className="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.05)] border border-outline-variant overflow-hidden">
-                      <div className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden">
+                      <button type="button" onClick={() => openCakeDetails(cake)} className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden text-left">
                         {cake.image ? (
                           <img 
                             src={cake.image} 
@@ -171,13 +210,22 @@ export default function Home({ setCurrentPage }) {
                             </span>
                           </div>
                         )}
-                      </div>
+                      </button>
                       <div className="p-6 flex flex-col gap-3">
-                        <h3 className="font-headline-md text-headline-md text-on-surface">{cake.name}</h3>
+                        <button type="button" onClick={() => openCakeDetails(cake)} className="text-left">
+                          <h3 className="font-headline-md text-headline-md text-on-surface">{cake.name}</h3>
+                        </button>
                         <div className="font-label-md text-label-md text-on-surface-variant bg-tertiary/10 p-2 rounded">
                           <p className="font-bold text-tertiary">{cake.defaultWeight} - {cake.defaultConfig}</p>
                         </div>
                         <p className="font-body-md text-body-md text-on-surface-variant line-clamp-3">{cake.description}</p>
+                        <button
+                          type="button"
+                          onClick={() => openCakeDetails(cake)}
+                          className="w-full py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors"
+                        >
+                          Ler mais
+                        </button>
                         <div className="mt-4 flex justify-between items-center">
                           <span className="font-label-md text-label-md text-primary font-bold">{formatPrice(cake.basePrice)}</span>
                         </div>
@@ -229,6 +277,30 @@ export default function Home({ setCurrentPage }) {
             </>
           )}
         </div>
+
+        <ProductDetailsModal
+          open={Boolean(selectedCake)}
+          item={selectedCake}
+          title={selectedCake?.name}
+          image={selectedCake?.image}
+          description={selectedCake?.description}
+          details={selectedCake ? [
+            { label: 'Peso padrão', value: selectedCake.defaultWeight || 'Não informado' },
+            { label: 'Configuração', value: selectedCake.defaultConfig || 'Não informada' },
+            { label: 'Preço', value: formatPrice(selectedCake.basePrice) },
+            ...(selectedCake.tag ? [{ label: 'Destaque', value: selectedCake.tag }] : [])
+          ] : []}
+          actions={selectedCake ? [
+            {
+              label: 'Quero esse! ✓',
+              onClick: () => {
+                handleAddCake(selectedCake)
+                closeCakeDetails()
+              }
+            }
+          ] : []}
+          onClose={closeCakeDetails}
+        />
       </section>
 
       {/* CTA Banner */}

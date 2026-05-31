@@ -4,11 +4,13 @@ import { formatPrice } from '../utils/formatPrice'
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../components/Button'
 import { actionButtonContainer } from '../styles/buttonClasses'
 import { useSiteData } from '../context/SiteDataContext'
+import ProductDetailsModal from '../components/ProductDetailsModal'
 
 export default function OrderBuilder({ setCurrentPage }) {
   const [step, setStep] = useState(0)
   const [customKg, setCustomKg] = useState('')
   const [hasSecondaryFilling, setHasSecondaryFilling] = useState(false)
+  const [selectedOption, setSelectedOption] = useState(null)
   const [order, setOrder] = useState({
     size: '',
     mass: 'branca',
@@ -106,6 +108,32 @@ export default function OrderBuilder({ setCurrentPage }) {
   const handlePrev = () => {
     if (step > 0) setStep(step - 1)
   }
+
+  const openOptionDetails = (option, index) => {
+    const currentStepLabel = steps[step]
+    const baseDetails = [
+      { label: 'Etapa', value: currentStepLabel },
+      { label: 'Preço', value: step !== 4 ? `+${formatPrice(option.value, false)}` : 'Incluído no cálculo por kg' }
+    ]
+
+    if (step === 4) {
+      baseDetails.push(
+        { label: 'Peso', value: option.weight || 'Não informado' },
+        { label: 'Porções', value: option.servings || 'Não informado' }
+      )
+    }
+
+    setSelectedOption({
+      title: option.label,
+      description: option.description,
+      image: option.image,
+      details: baseDetails,
+      raw: option,
+      index
+    })
+  }
+
+  const closeOptionDetails = () => setSelectedOption(null)
 
   const calculatePrice = () => {
     if (!selectedKg) return 0
@@ -239,10 +267,9 @@ export default function OrderBuilder({ setCurrentPage }) {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4 mb-8">
-                    {currentOption.map(option => (
-                      <button
+                    {currentOption.map((option, index) => (
+                      <div
                         key={option.id}
-                        onClick={() => handleSelect(option.id)}
                         className={`w-full p-3 sm:p-4 rounded-lg border-2 transition-all text-left ${
                           selectedValue === option.id
                             ? 'border-primary bg-primary/10'
@@ -252,7 +279,11 @@ export default function OrderBuilder({ setCurrentPage }) {
                         <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 items-start">
                           {/* Image */}
                           {option.image && (
-                            <div className="w-full h-24 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container">
+                            <button
+                              type="button"
+                              onClick={() => openOptionDetails(option, index)}
+                              className="w-full h-24 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-surface-container text-left"
+                            >
                               <img 
                                 src={option.image} 
                                 alt={option.label}
@@ -261,12 +292,14 @@ export default function OrderBuilder({ setCurrentPage }) {
                                   e.target.style.display = 'none'
                                 }}
                               />
-                            </div>
+                            </button>
                           )}
 
                           {/* Content */}
                           <div className="flex-1">
-                            <p className="font-headline-md text-[0.95rem] sm:text-headline-md text-on-surface leading-tight">{option.label}</p>
+                            <button type="button" onClick={() => openOptionDetails(option, index)} className="text-left w-full">
+                              <p className="font-headline-md text-[0.95rem] sm:text-headline-md text-on-surface leading-tight">{option.label}</p>
+                            </button>
                             <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mt-1 line-clamp-2">{option.description}</p>
                             
                             {/* Weight/Servings info for sizes */}
@@ -276,6 +309,13 @@ export default function OrderBuilder({ setCurrentPage }) {
                                 <span>👥 {option.servings}</span>
                               </div>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => openOptionDetails(option, index)}
+                              className="mt-3 w-full py-2 border border-outline-variant text-on-surface font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-surface-container transition-colors"
+                            >
+                              Ler mais
+                            </button>
                           </div>
 
                           <div className="flex-shrink-0 text-right sm:ml-auto w-full sm:w-auto mt-1 sm:mt-0">
@@ -284,9 +324,16 @@ export default function OrderBuilder({ setCurrentPage }) {
                                 +{formatPrice(option.value, false)}
                               </span>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => handleSelect(option.id)}
+                              className="mt-3 w-full sm:w-auto px-4 py-2 rounded-lg bg-primary text-white font-label-md text-[0.8rem] sm:text-label-md hover:bg-primary-light transition-colors"
+                            >
+                              Selecionar
+                            </button>
                           </div>
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -524,6 +571,16 @@ export default function OrderBuilder({ setCurrentPage }) {
           </div>
         </div>
       </section>
+
+      <ProductDetailsModal
+        open={Boolean(selectedOption)}
+        item={selectedOption?.raw}
+        title={selectedOption?.title}
+        image={selectedOption?.image}
+        description={selectedOption?.description}
+        details={selectedOption?.details || []}
+        onClose={closeOptionDetails}
+      />
     </main>
   )
 }

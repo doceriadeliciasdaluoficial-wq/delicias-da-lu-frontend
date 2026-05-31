@@ -2,10 +2,12 @@ import React, { useState, useContext } from 'react'
 import { CartContext } from '../context/CartContext'
 import { formatPrice, formatPriceWithUnit } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
+import ProductDetailsModal from '../components/ProductDetailsModal'
 
 export default function Menu({ setCurrentPage }) {
   const [activeTab, setActiveTab] = useState('bolos')
   const [sweetQuantities, setSweetQuantities] = useState({})
+  const [selectedItem, setSelectedItem] = useState(null)
   const { addToCart } = useContext(CartContext)
   const { menuData, contacts } = useSiteData()
   const customSections = menuData.customSections || []
@@ -38,6 +40,18 @@ export default function Menu({ setCurrentPage }) {
       description: item.description
     })
   }
+
+  const openDetails = (item, details = []) => {
+    setSelectedItem({
+      title: item.name || item.label,
+      image: item.image,
+      description: item.description,
+      details,
+      raw: item
+    })
+  }
+
+  const closeDetails = () => setSelectedItem(null)
 
   return (
     <main className="min-h-screen bg-background pt-20">
@@ -92,7 +106,15 @@ export default function Menu({ setCurrentPage }) {
                     {group.items.map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                         {/* Image Placeholder */}
-                        <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category || group.category },
+                            { label: 'Preço', value: item.customPrice ? 'Valor a combinar' : formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Tipo', value: 'Bolo do cardápio' }
+                          ])}
+                          className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl overflow-hidden text-left"
+                        >
                           {item.image ? (
                             <img 
                               src={item.image} 
@@ -101,16 +123,33 @@ export default function Menu({ setCurrentPage }) {
                               onError={(e) => { e.target.style.display = 'none' }}
                             />
                           ) : <span>🍰</span>}
-                        </div>
+                        </button>
                         {/* Content */}
                         <div className="p-3 sm:p-6">
-                          <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          <button type="button" onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category || group.category },
+                            { label: 'Preço', value: item.customPrice ? 'Valor a combinar' : formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Tipo', value: 'Bolo do cardápio' }
+                          ])} className="text-left w-full">
+                            <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          </button>
                           <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">{item.description}</p>
                           <div className="flex justify-between items-center mb-4">
                             <span className="font-label-md text-[0.8rem] sm:text-label-md text-primary font-bold">
                               {item.customPrice ? 'Valor a combinar' : formatPriceWithUnit(item.price, item.unit)}
                             </span>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => openDetails(item, [
+                              { label: 'Categoria', value: item.category || group.category },
+                              { label: 'Preço', value: item.customPrice ? 'Valor a combinar' : formatPriceWithUnit(item.price, item.unit) },
+                              { label: 'Tipo', value: 'Bolo do cardápio' }
+                            ])}
+                            className="w-full mb-2 py-2 border border-outline-variant text-on-surface font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
+                          >
+                            Ler mais
+                          </button>
                           {!item.customPrice && (
                             <button
                               onClick={() => handleAddBoloSimples(item)}
@@ -146,17 +185,42 @@ export default function Menu({ setCurrentPage }) {
                     .filter(item => item.category === 'Tamanho Festa (forminha nº6)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
-                        <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl">
+                        <button
+                          type="button"
+                          onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category },
+                            { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Quantidade mínima', value: '25 unidades' }
+                          ])}
+                          className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl text-left"
+                        >
                           {item.image ? (
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
                           ) : <span>🍫</span>}
-                        </div>
+                        </button>
                         <div className="p-3 sm:p-6">
-                          <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          <button type="button" onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category },
+                            { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Quantidade mínima', value: '25 unidades' }
+                          ])} className="text-left w-full">
+                            <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          </button>
                           <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mb-3 sm:mb-4 line-clamp-3">{item.description}</p>
                           <div className="flex justify-between items-center mb-4">
                             <span className="font-label-md text-[0.8rem] sm:text-label-md text-primary font-bold">{formatPriceWithUnit(item.price, item.unit)}</span>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => openDetails(item, [
+                              { label: 'Categoria', value: item.category },
+                              { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                              { label: 'Quantidade mínima', value: '25 unidades' }
+                            ])}
+                            className="w-full mb-2 py-2 border border-outline-variant text-on-surface font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
+                          >
+                            Ler mais
+                          </button>
                           <div className="flex items-center gap-1 mb-3 min-w-0">
                             <input type="number" min="25" step="25" defaultValue="25" onChange={(e) => setSweetQuantities(prev => ({ ...prev, [item.name]: parseInt(e.target.value) || 25 }))} className="flex-1 min-w-0 px-2 py-2 border border-outline-variant rounded bg-surface font-label-md text-[0.85rem] sm:text-label-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             <span className="text-xs sm:text-sm text-on-surface-variant flex-shrink-0">un</span>
@@ -176,17 +240,42 @@ export default function Menu({ setCurrentPage }) {
                     .filter(item => item.category === 'Tamanho Maior (caixinha)')
                     .map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
-                        <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl">
+                        <button
+                          type="button"
+                          onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category },
+                            { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Quantidade mínima', value: '25 unidades' }
+                          ])}
+                          className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl text-left"
+                        >
                           {item.image ? (
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
                           ) : <span>🍫</span>}
-                        </div>
+                        </button>
                         <div className="p-3 sm:p-6">
-                          <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          <button type="button" onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: item.category },
+                            { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                            { label: 'Quantidade mínima', value: '25 unidades' }
+                          ])} className="text-left w-full">
+                            <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name}</h4>
+                          </button>
                           <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mb-3 sm:mb-4 line-clamp-3">{item.description}</p>
                           <div className="flex justify-between items-center mb-4">
                             <span className="font-label-md text-[0.8rem] sm:text-label-md text-primary font-bold">{formatPriceWithUnit(item.price, item.unit)}</span>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => openDetails(item, [
+                              { label: 'Categoria', value: item.category },
+                              { label: 'Preço', value: formatPriceWithUnit(item.price, item.unit) },
+                              { label: 'Quantidade mínima', value: '25 unidades' }
+                            ])}
+                            className="w-full mb-2 py-2 border border-outline-variant text-on-surface font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
+                          >
+                            Ler mais
+                          </button>
                           <div className="flex items-center gap-1 mb-3 min-w-0">
                             <input type="number" min="25" step="25" defaultValue="25" onChange={(e) => setSweetQuantities(prev => ({ ...prev, [item.name]: parseInt(e.target.value) || 25 }))} className="flex-1 min-w-0 px-2 py-2 border border-outline-variant rounded bg-surface font-label-md text-[0.85rem] sm:text-label-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             <span className="text-xs sm:text-sm text-on-surface-variant flex-shrink-0">un</span>
@@ -274,17 +363,42 @@ export default function Menu({ setCurrentPage }) {
                 <h3 className="font-headline-md text-headline-md text-primary mb-6">{section.label}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                   {(section.items || []).map((item, i) => (
-                    <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
-                      <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl">
+                      <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: section.label },
+                            { label: 'Preço', value: item.price !== undefined ? formatPriceWithUnit(item.price, item.unit || 'un') : 'Não informado' },
+                            ...(item.minQuantity ? [{ label: 'Quantidade mínima', value: `${item.minQuantity} unidades` }] : [])
+                          ])}
+                          className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl text-left"
+                        >
                         {item.image ? (
                           <img src={item.image} alt={item.name || item.label} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
                         ) : <span>🍮</span>}
-                      </div>
+                        </button>
                       <div className="p-3 sm:p-6">
-                        <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name || item.label}</h4>
+                        <button type="button" onClick={() => openDetails(item, [
+                          { label: 'Categoria', value: section.label },
+                          { label: 'Preço', value: item.price !== undefined ? formatPriceWithUnit(item.price, item.unit || 'un') : 'Não informado' },
+                          ...(item.minQuantity ? [{ label: 'Quantidade mínima', value: `${item.minQuantity} unidades` }] : [])
+                        ])} className="text-left w-full">
+                          <h4 className="font-headline-md text-[1rem] sm:text-headline-md text-on-surface mb-2 leading-tight">{item.name || item.label}</h4>
+                        </button>
                         {item.description && (
                           <p className="font-body-sm sm:font-body-md text-body-sm sm:text-body-md text-on-surface-variant mb-3 sm:mb-4 line-clamp-3">{item.description}</p>
                         )}
+                        <button
+                          type="button"
+                          onClick={() => openDetails(item, [
+                            { label: 'Categoria', value: section.label },
+                            { label: 'Preço', value: item.price !== undefined ? formatPriceWithUnit(item.price, item.unit || 'un') : 'Não informado' },
+                            ...(item.minQuantity ? [{ label: 'Quantidade mínima', value: `${item.minQuantity} unidades` }] : [])
+                          ])}
+                          className="w-full mb-2 py-2 border border-outline-variant text-on-surface font-label-md text-[0.8rem] sm:text-label-md rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
+                        >
+                          Ler mais
+                        </button>
                         {item.price !== undefined && (
                           <div className="flex justify-between items-center mb-4">
                             <span className="font-label-md text-[0.8rem] sm:text-label-md text-primary font-bold">{formatPriceWithUnit(item.price, item.unit || 'un')}</span>
@@ -326,6 +440,16 @@ export default function Menu({ setCurrentPage }) {
               </div>
             ))}
         </div>
+
+        <ProductDetailsModal
+          open={Boolean(selectedItem)}
+          item={selectedItem?.raw || selectedItem}
+          title={selectedItem?.title}
+          image={selectedItem?.image}
+          description={selectedItem?.description}
+          details={selectedItem?.details || []}
+          onClose={closeDetails}
+        />
 
         {/* CTA Footer */}
         <div className="mt-20 text-center p-6 sm:p-8 bg-primary/10 rounded-lg border border-primary/20">
