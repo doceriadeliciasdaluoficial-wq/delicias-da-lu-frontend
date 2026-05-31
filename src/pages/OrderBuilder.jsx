@@ -319,11 +319,16 @@ export default function OrderBuilder({ setCurrentPage }) {
                             </button>
                           </div>
 
-                          <div className="flex-shrink-0 text-right sm:ml-auto w-full sm:w-auto mt-1 sm:mt-0">
+                          <div className="flex-shrink-0 flex w-full sm:w-auto flex-col items-start sm:items-end gap-2 mt-1 sm:mt-0 sm:ml-auto">
                             {step !== 4 && (
-                              <span className={`font-label-md text-[0.8rem] sm:text-label-md font-bold ${selectedValue === option.id ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                +{formatPrice(option.value, false)}
-                              </span>
+                              <>
+                                <span className="text-[0.68rem] sm:text-[0.72rem] uppercase tracking-[0.12em] text-on-surface-variant">
+                                  Valor
+                                </span>
+                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-[0.8rem] sm:text-label-md font-bold ${selectedValue === option.id ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface'}`}>
+                                  {formatPrice(option.value)}
+                                </span>
+                              </>
                             )}
                             <button
                               type="button"

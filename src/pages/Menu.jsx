@@ -57,20 +57,20 @@ export default function Menu({ setCurrentPage }) {
 
   return (
     <main className="min-h-screen bg-background pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-20 py-10 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-20 py-3 md:py-4">
         {/* Header */}
-        <div className="flex flex-col items-center mb-16 text-center">
+        <div className="flex flex-col items-center mb-3 md:mb-4 text-center">
           <h1 className="font-headline-lg text-headline-lg text-on-background relative inline-block">
             ☕ Cardápio
             <span className="absolute -bottom-2 left-1/4 right-1/4 h-[2px] bg-tertiary rounded-full"></span>
           </h1>
-          <p className="font-body-md text-body-md text-on-surface-variant mt-4 max-w-2xl">
+          <p className="font-body-md text-body-md text-on-surface-variant mt-2 md:mt-3 max-w-2xl">
             Massas branca ou chocolate. Cobertura em chantilly. Tudo feito na hora, com carinho.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-10 flex-nowrap overflow-x-auto justify-start md:justify-center sticky top-16 md:top-20 bg-background py-3 z-30 border-b border-outline-variant/60 md:border-b-0 md:relative md:top-0 md:bg-transparent md:py-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex gap-2 mb-4 md:mb-6 flex-nowrap overflow-x-auto justify-start md:justify-center relative bg-background py-2 border-b border-outline-variant/60 md:border-b-0 md:bg-transparent md:py-0 -mx-4 md:-mx-0 px-4 md:px-0">
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -87,7 +87,7 @@ export default function Menu({ setCurrentPage }) {
         </div>
 
         {/* Content */}
-        <div className="space-y-12">
+        <div className="space-y-6 md:space-y-8 mt-4 md:mt-6 pt-0">
           {/* BOLOS TAB */}
           {activeTab === 'bolos' && (
             <div className="space-y-12">
@@ -101,7 +101,7 @@ export default function Menu({ setCurrentPage }) {
                 return acc
               }, []).map((group, idx) => (
                 <div key={idx}>
-                  <h3 className="font-headline-md text-headline-md text-primary mb-6 flex items-center gap-2">
+                  <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4 flex items-center gap-2">
                     {group.category}
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -179,9 +179,9 @@ export default function Menu({ setCurrentPage }) {
 
           {/* DOCES SIMPLES TAB */}
           {activeTab === 'docesSimples' && (
-            <div className="space-y-8">
+              <div className="space-y-5 md:space-y-6">
               <div>
-                <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Festa (forminha nº6)</h3>
+                <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4">Tamanho Festa (forminha nº6)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                   {sortByOrder(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Festa (forminha nº6)')
@@ -236,7 +236,7 @@ export default function Menu({ setCurrentPage }) {
                 </div>
               </div>
               <div>
-                <h3 className="font-headline-md text-headline-md text-primary mb-6">Tamanho Maior (caixinha)</h3>
+                <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4">Tamanho Maior (caixinha)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                   {sortByOrder(menuData.docesSimples || [])
                     .filter(item => item.category === 'Tamanho Maior (caixinha)')
@@ -296,7 +296,7 @@ export default function Menu({ setCurrentPage }) {
           {/* DOCES FINOS TAB */}
           {activeTab === 'docesFinos' && (
             <div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-6">Doces Finos (por unidade, mín. 15)</h3>
+              <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4">Doces Finos (por unidade, mín. 15)</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {sortByOrder(menuData.docesFinos || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
@@ -330,8 +330,8 @@ export default function Menu({ setCurrentPage }) {
           {/* DECORAÇÕES TAB */}
           {activeTab === 'decoracoes' && (
             <div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-6">Opções de Decoração</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant mb-8">Decorações têm valores à parte. Consulte no orçamento.</p>
+              <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4">Opções de Decoração</h3>
+              <p className="font-body-md text-body-md text-on-surface-variant mb-6">Decorações têm valores à parte. Consulte no orçamento.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {sortByOrder(menuData.decoracoes || []).map((item, i) => (
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm p-5 sm:p-6">
@@ -362,7 +362,7 @@ export default function Menu({ setCurrentPage }) {
             .filter((section) => section.id === activeTab)
             .map((section) => (
               <div key={section.id}>
-                <h3 className="font-headline-md text-headline-md text-primary mb-6">{section.label}</h3>
+                <h3 className="font-headline-md text-headline-md text-primary mb-3 md:mb-4">{section.label}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                   {sortByOrder(section.items || []).map((item, i) => (
                       <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
