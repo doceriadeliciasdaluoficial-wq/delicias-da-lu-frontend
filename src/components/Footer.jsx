@@ -3,7 +3,13 @@ import { useSiteData } from '../context/SiteDataContext'
 
 export default function Footer() {
   const { contacts } = useSiteData()
-  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`
+  
+  // Handle undefined contacts
+  if (!contacts?.whatsapp?.link || !contacts?.email?.address) {
+    return null
+  }
+  
+  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message?.default || 'Oi!')}`
   const email = contacts.email.address
 
   return (

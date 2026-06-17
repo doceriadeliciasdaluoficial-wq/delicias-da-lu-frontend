@@ -18,6 +18,18 @@ export function SiteDataProvider({ children }) {
         setLoading(true)
         setError(null)
         
+        // First, try to load from localStorage
+        const savedConfig = localStorage.getItem('siteData')
+        if (savedConfig) {
+          try {
+            const parsedConfig = JSON.parse(savedConfig)
+            console.log('Loaded data from localStorage')
+            setSiteConfig(parsedConfig)
+          } catch (parseErr) {
+            console.warn('Failed to parse localStorage data:', parseErr)
+          }
+        }
+        
         console.log('Starting data load from backend...')
         
         const [menuData, cakeBuilderData, contactsData, homeData] = await Promise.all([
@@ -106,6 +118,16 @@ export function SiteDataProvider({ children }) {
     loadData()
   }, [])
 
+  // Save to localStorage whenever siteConfig changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('siteData', JSON.stringify(siteConfig))
+      console.log('Saved siteConfig to localStorage')
+    } catch (err) {
+      console.warn('Failed to save to localStorage:', err)
+    }
+  }, [siteConfig])
+
   const updateSiteConfig = async (updater) => {
     const next = typeof updater === 'function' ? updater(siteConfig) : updater
     setSiteConfig(next)
@@ -143,28 +165,45 @@ export function SiteDataProvider({ children }) {
 
       // Update cake builder components by type
       if (next.cakeBuilder) {
-        const types = ['massas', 'recheios', 'coberturas', 'decoracoes']
-        for (const type of types) {
-          const items = next.cakeBuilder[type] || []
+        // Map English frontend keys to Portuguese backend keys
+        const keyMapping = {
+          masses: 'massas',
+          fillings: 'recheios',
+          toppings: 'coberturas',
+          decorations: 'decoracoes',
+          sizes: 'sizes'
+        }
+        
+        for (const [frontendKey, backendType] of Object.entries(keyMapping)) {
+          const items = next.cakeBuilder[frontendKey] || []
+          if (!Array.isArray(items)) {
+            console.warn(`Expected array for ${frontendKey}, got ${typeof items}`)
+            continue
+          }
+          
           for (const item of items) {
+            if (!item.id) {
+              console.warn(`Item in ${frontendKey} has no id, skipping`)
+              continue
+            }
+            
             try {
-              // Try to update first, if it fails, try to create
-              await cakeBuilderService.update(type, item.id, item)
-            } catch (err) {
-              // Log full error details
-              const errorMsg = err?.response?.data?.message || err?.message || 'Unknown error'
-              console.warn(`CakeBuilder update failed for ${item.id} (${type}):`, errorMsg, err)
-              
-              if (err.response?.status === 404) {
-                // Item doesn't exist, create it
+              // First, try to update the item
+              await cakeBuilderService.update(frontendKey, item.id, item)
+            } catch (updateErr) {
+              // If update fails with 404, try creating instead
+              if (updateErr.response?.status === 404) {
                 try {
-                  console.log(`Creating new cake builder component: ${item.id} (${type})`)
-                  await cakeBuilderService.create(type, item)
-                  console.log(`Successfully created cake builder component ${item.id}`)
+                  console.log(`Creating new cake builder component: ${item.id} (${frontendKey})`)
+                  await cakeBuilderService.create(frontendKey, item)
                 } catch (createErr) {
                   const createErrorMsg = createErr?.response?.data?.message || createErr?.message || 'Unknown error'
-                  console.error(`Failed to create cake builder component ${item.id}:`, createErrorMsg, createErr)
+                  console.error(`Failed to create cake builder component ${item.id}:`, createErrorMsg)
                 }
+              } else {
+                // Other errors (not 404) - log but continue
+                const updateErrorMsg = updateErr?.response?.data?.message || updateErr?.message || 'Unknown error'
+                console.warn(`Failed to update cake builder component ${item.id}:`, updateErrorMsg)
               }
             }
           }

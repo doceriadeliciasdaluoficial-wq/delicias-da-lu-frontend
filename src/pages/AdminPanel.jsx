@@ -1032,12 +1032,12 @@ export default function AdminPanel({ onExit }) {
 
   const confirmDelete = (message) => window.confirm(message)
 
-  const saveEditor = () => {
+  const saveEditor = async () => {
     if (!editor) return
 
     if (editor.kind === 'cake') {
       const normalized = normalizeNumbers(editor.item)
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         next.cakeBuilder[editor.sectionKey] = saveItemByOrder(next.cakeBuilder[editor.sectionKey] || [], normalized, editor.index)
         return next
@@ -1049,7 +1049,7 @@ export default function AdminPanel({ onExit }) {
 
     if (editor.kind === 'menu') {
       const normalized = normalizeNumbers(editor.item)
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         const standardIds = standardMenuSectionIds
 
@@ -1071,7 +1071,7 @@ export default function AdminPanel({ onExit }) {
     }
 
     if (editor.kind === 'menu-section') {
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         const customSections = [...(next.menu.customSections || [])]
         const originalId = editor.originalId || editor.sectionKey
@@ -1106,7 +1106,7 @@ export default function AdminPanel({ onExit }) {
       const nextLabel = String(editor.item.label || '').trim()
       if (!nextLabel) return
 
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         next.menu.sectionLabels = {
           ...(next.menu.sectionLabels || {}),
@@ -1121,7 +1121,7 @@ export default function AdminPanel({ onExit }) {
 
     if (editor.kind === 'home') {
       const normalized = normalizeNumbers(editor.item)
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         next.home = next.home || {}
         next.home.featuredCakes = saveItemByOrder(next.home.featuredCakes || [], normalized, editor.index)
@@ -1133,7 +1133,7 @@ export default function AdminPanel({ onExit }) {
     }
 
     if (editor.kind === 'contacts') {
-      updateSiteConfig((current) => {
+      await updateSiteConfig((current) => {
         const next = deepClone(current)
         const sanitizedNumber = String(getPathValue(editor.item, 'whatsapp.number') || '').replace(/\D/g, '')
         next.contacts = deepClone(editor.item)

@@ -3,7 +3,13 @@ import { useSiteData } from '../context/SiteDataContext'
 
 export default function FloatingWhatsAppButton() {
   const { contacts } = useSiteData()
-  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`
+  
+  // Handle undefined contacts
+  if (!contacts?.whatsapp?.link) {
+    return null
+  }
+  
+  const whatsappLink = `${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message?.default || 'Oi!')}`
 
   return (
     <a

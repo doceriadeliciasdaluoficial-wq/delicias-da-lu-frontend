@@ -40,13 +40,13 @@ export default function Home({ setCurrentPage }) {
       quantity: 1,
       isCake: true,
       details: {
-        size: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.label,
-        weight: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.weight,
-        servings: cakeBuilder.sizes.find(s => s.id === cake.config.size)?.servings,
-        mass: cakeBuilder.masses.find(m => m.id === cake.config.mass)?.label,
-        filling: cakeBuilder.fillings.find(f => f.id === cake.config.filling)?.label,
-        topping: cakeBuilder.toppings.find(t => t.id === cake.config.topping)?.label,
-        decoration: cakeBuilder.decorations.find(d => d.id === cake.config.decoration)?.label
+        size: cakeBuilder?.sizes?.find(s => s.id === cake.config.size)?.label,
+        weight: cakeBuilder?.sizes?.find(s => s.id === cake.config.size)?.weight,
+        servings: cakeBuilder?.sizes?.find(s => s.id === cake.config.size)?.servings,
+        mass: cakeBuilder?.masses?.find(m => m.id === cake.config.mass)?.label,
+        filling: cakeBuilder?.fillings?.find(f => f.id === cake.config.filling)?.label,
+        topping: cakeBuilder?.toppings?.find(t => t.id === cake.config.topping)?.label,
+        decoration: cakeBuilder?.decorations?.find(d => d.id === cake.config.decoration)?.label
       }
     })
   }
@@ -100,15 +100,17 @@ export default function Home({ setCurrentPage }) {
             >
               Ver Cardápio
             </button>
-            <a
-              href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.default)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 bg-white text-on-surface border border-outline-variant font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.1)] hover:bg-surface hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <span className="material-symbols-outlined text-primary">chat</span>
-              WhatsApp
-            </a>
+            {contacts?.whatsapp?.link && (
+              <a
+                href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message?.default || 'Oi!')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 bg-white text-on-surface border border-outline-variant font-label-md text-label-md rounded-lg shadow-[0_4px_16px_rgba(62,31,13,0.1)] hover:bg-surface hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto"
+              >
+                <span className="material-symbols-outlined text-primary">chat</span>
+                WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -332,19 +334,22 @@ export default function Home({ setCurrentPage }) {
             >
               🎂 Acessar Cake Builder
             </button>
-            <a
-              href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message.custom)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 border-2 border-primary-fixed text-surface-container-lowest font-label-md text-label-md rounded-lg hover:bg-primary-fixed/20 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
-            >
-              Solicitar Orçamento
-            </a>
+            {contacts?.whatsapp?.link && (
+              <a
+                href={`${contacts.whatsapp.link}?text=${encodeURIComponent(contacts.whatsapp.message?.custom || 'Gostaria de solicitar um orçamento')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 border-2 border-primary-fixed text-surface-container-lowest font-label-md text-label-md rounded-lg hover:bg-primary-fixed/20 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
+              >
+                Solicitar Orçamento
+              </a>
+            )}
           </div>
         </div>
       </section>
 
       {/* Instagram Section */}
+      {contacts?.instagram && (
       <section className="py-16 md:py-24 px-4 sm:px-6 md:px-20 bg-surface">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center mb-12 text-center">
@@ -382,6 +387,7 @@ export default function Home({ setCurrentPage }) {
           </div>
         </div>
       </section>
+      )}
     </main>
   )
 }
