@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { useSiteData } from '../context/SiteDataContext'
 import sortByOrder from '../utils/sortByOrder'
+import ImageUploader from '../components/ImageUploader'
+import ImageDisplay from '../components/ImageDisplay'
 
 const ADMIN_PATH = '/painel-interno-secreto-lu'
 
@@ -302,7 +304,8 @@ function getBaseMenuItem(sectionKey) {
   const base = baseMenuDefaults[sectionKey] || baseMenuDefaults.custom
   return {
     ...deepClone(base),
-    id: createId(sectionKey)
+    id: createId(sectionKey),
+    category: sectionKey  // Auto-set category to the section ID
   }
 }
 
@@ -314,24 +317,25 @@ function getBaseHomeItem() {
 }
 
 function getContactsDraft(contacts) {
+  const safeContacts = contacts || {}
   return deepClone({
     ...contactEditorBase,
-    ...contacts,
+    ...safeContacts,
     whatsapp: {
       ...contactEditorBase.whatsapp,
-      ...(contacts.whatsapp || {})
+      ...(safeContacts.whatsapp || {})
     },
     email: {
       ...contactEditorBase.email,
-      ...(contacts.email || {})
+      ...(safeContacts.email || {})
     },
     instagram: {
       ...contactEditorBase.instagram,
-      ...(contacts.instagram || {})
+      ...(safeContacts.instagram || {})
     },
     location: {
       ...contactEditorBase.location,
-      ...(contacts.location || {})
+      ...(safeContacts.location || {})
     }
   })
 }
@@ -539,47 +543,29 @@ function FormField({ field, value, onChange }) {
 
   if (field.type === 'image') {
     return (
-      <label className="flex flex-col gap-1 md:col-span-2">
-        <span className="text-sm text-on-surface-variant">{label}</span>
-        <input
-          type="text"
-          value={value ?? ''}
-          onChange={(event) => onChange(field.path, event.target.value)}
-          className="w-full border border-outline-variant rounded-lg px-3 py-2 bg-surface"
-          placeholder="URL da imagem"
+      <div className="md:col-span-2">
+        <ImageUploader
+          label={label}
+          onImageBase64Change={(base64, mimeType) => {
+            onChange(field.path, base64 === null ? null : (base64 || ''))
+          }}
         />
-        <div className="flex flex-wrap gap-2">
-          <label className="px-3 py-2 rounded-lg bg-surface-container cursor-pointer border border-outline-variant text-sm">
-            Upload
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const reader = new FileReader()
-                reader.onload = () => onChange(field.path, String(reader.result || ''))
-                reader.readAsDataURL(file)
+        {value && (
+          <div className="mt-3">
+            <p className="text-xs text-on-surface-variant mb-2">Prévia:</p>
+            <ImageDisplay
+              imageBase64={value}
+              alt={`${field.path}-preview`}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '200px',
+                borderRadius: '8px',
+                border: '1px solid var(--md-sys-color-outline-variant)',
               }}
             />
-          </label>
-          <button
-            type="button"
-            className="px-3 py-2 rounded-lg bg-error/10 text-error border border-error/20 text-sm"
-            onClick={() => onChange(field.path, '')}
-          >
-            Remover imagem
-          </button>
-        </div>
-        {value && (
-          <img
-            src={value}
-            alt={`${field.path}-preview`}
-            className="w-full max-h-40 object-cover rounded-lg border border-outline-variant"
-          />
+          </div>
         )}
-      </label>
+      </div>
     )
   }
 
@@ -1420,7 +1406,7 @@ export default function AdminPanel({ onExit }) {
           </section>
         )}
 
-        {activeTab === 'contacts' && (
+        {activeTab === 'contacts' && contacts && (
           <section className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-start">
             <div className="bg-surface rounded-xl border border-outline-variant p-5 space-y-4">
               <div>
@@ -1431,19 +1417,19 @@ export default function AdminPanel({ onExit }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">WhatsApp</p>
-                  <p className="font-medium text-on-surface break-words">{contacts.whatsapp.display || formatBrazilianPhone(contacts.whatsapp.number)}</p>
+                  <p className="font-medium text-on-surface break-words">{contacts?.whatsapp?.display || formatBrazilianPhone(contacts?.whatsapp?.number)}</p>
                 </div>
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">Email</p>
-                  <p className="font-medium text-on-surface break-words">{contacts.email.address}</p>
+                  <p className="font-medium text-on-surface break-words">{contacts?.email?.address}</p>
                 </div>
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">Instagram</p>
-                  <p className="font-medium text-on-surface break-words">{contacts.instagram.handle}</p>
+                  <p className="font-medium text-on-surface break-words">{contacts?.instagram?.handle}</p>
                 </div>
                 <div className="rounded-xl border border-outline-variant p-4 bg-background">
                   <p className="text-xs uppercase tracking-wide text-on-surface-variant mb-1">Maps</p>
-                  <p className="font-medium text-on-surface break-all">{contacts.location.mapsUrl}</p>
+                  <p className="font-medium text-on-surface break-all">{contacts?.location?.mapsUrl}</p>
                 </div>
               </div>
             </div>

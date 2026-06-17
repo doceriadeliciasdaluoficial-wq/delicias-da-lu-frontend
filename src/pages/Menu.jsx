@@ -3,6 +3,7 @@ import { CartContext } from '../context/CartContext'
 import { formatPrice, formatPriceWithUnit } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
 import ProductDetailsModal from '../components/ProductDetailsModal'
+import ImageDisplay from '../components/ImageDisplay'
 import sortByOrder from '../utils/sortByOrder'
 
 export default function Menu({ setCurrentPage }) {
@@ -118,11 +119,15 @@ export default function Menu({ setCurrentPage }) {
                           className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl overflow-hidden text-left"
                         >
                           {item.image ? (
-                            <img 
-                              src={item.image} 
+                            <ImageDisplay
+                              imageBase64={item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => { e.target.style.display = 'none' }}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: 0,
+                              }}
                             />
                           ) : <span>🍰</span>}
                         </button>
@@ -197,7 +202,16 @@ export default function Menu({ setCurrentPage }) {
                           className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl text-left"
                         >
                           {item.image ? (
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
+                            <ImageDisplay
+                              imageBase64={item.image}
+                              alt={item.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: 0,
+                              }}
+                            />
                           ) : <span>🍫</span>}
                         </button>
                         <div className="p-3 sm:p-6">
@@ -252,7 +266,16 @@ export default function Menu({ setCurrentPage }) {
                           className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-4xl text-left"
                         >
                           {item.image ? (
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
+                            <ImageDisplay
+                              imageBase64={item.image}
+                              alt={item.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: 0,
+                              }}
+                            />
                           ) : <span>🍫</span>}
                         </button>
                         <div className="p-3 sm:p-6">
@@ -302,7 +325,16 @@ export default function Menu({ setCurrentPage }) {
                   <div key={i} className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                     <div className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl">
                       {item.image ? (
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
+                        <ImageDisplay
+                          imageBase64={item.image}
+                          alt={item.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: 0,
+                          }}
+                        />
                       ) : <span>✨</span>}
                     </div>
                     <div className="p-3 sm:p-6">
@@ -376,7 +408,16 @@ export default function Menu({ setCurrentPage }) {
                           className="relative w-full aspect-video bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-3xl text-left"
                         >
                         {item.image ? (
-                          <img src={item.image} alt={item.name || item.label} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
+                          <ImageDisplay
+                            imageBase64={item.image}
+                            alt={item.name || item.label}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: 0,
+                            }}
+                          />
                         ) : <span>🍮</span>}
                         </button>
                       <div className="p-3 sm:p-6">

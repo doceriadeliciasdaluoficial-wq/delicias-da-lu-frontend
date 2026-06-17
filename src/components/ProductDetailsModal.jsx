@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import ImageDisplay from './ImageDisplay'
 
 export default function ProductDetailsModal({ open, item, title, image, description, details = [], actions = [], onClose }) {
   useEffect(() => {
@@ -36,18 +37,18 @@ export default function ProductDetailsModal({ open, item, title, image, descript
         </div>
 
         <div className="overflow-y-auto">
-          {(image || item.image) && (
+          {(image || item?.image) && (
             <div className="w-full aspect-[16/10] bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center overflow-hidden">
-              {image || item.image ? (
-                <img
-                  src={image || item.image}
-                  alt={title || item.name || item.label}
-                  className="w-full h-full object-cover"
-                  onError={(event) => {
-                    event.currentTarget.style.display = 'none'
-                  }}
-                />
-              ) : null}
+              <ImageDisplay
+                imageBase64={image || item?.image}
+                alt={title || item?.name || item?.label || 'Product'}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: 0,
+                }}
+              />
             </div>
           )}
 

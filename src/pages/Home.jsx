@@ -3,6 +3,7 @@ import { CartContext } from '../context/CartContext'
 import { formatPrice } from '../utils/formatPrice'
 import { useSiteData } from '../context/SiteDataContext'
 import ProductDetailsModal from '../components/ProductDetailsModal'
+import ImageDisplay from '../components/ImageDisplay'
 import sortByOrder from '../utils/sortByOrder'
 
 export default function Home({ setCurrentPage }) {
@@ -140,11 +141,16 @@ export default function Home({ setCurrentPage }) {
               >
                 <button type="button" onClick={() => openCakeDetails(cake)} className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden text-left">
                   {cake.image ? (
-                    <img 
-                      src={cake.image} 
+                    <ImageDisplay
+                      imageBase64={cake.image}
                       alt={cake.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => { e.target.style.display = 'none' }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: 0,
+                      }}
+                      className="group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : <span>🍰</span>}
                   {cake.tag && (
@@ -197,11 +203,15 @@ export default function Home({ setCurrentPage }) {
                     <div className="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(62,31,13,0.05)] border border-outline-variant overflow-hidden">
                       <button type="button" onClick={() => openCakeDetails(cake)} className="relative w-full aspect-square p-2 bg-gradient-to-br from-primary-fixed-dim to-tertiary-fixed/30 flex items-center justify-center text-5xl overflow-hidden text-left">
                         {cake.image ? (
-                          <img 
-                            src={cake.image} 
+                          <ImageDisplay
+                            imageBase64={cake.image}
                             alt={cake.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.target.style.display = 'none' }}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: 0,
+                            }}
                           />
                         ) : <span>🍰</span>}
                         {cake.tag && (
