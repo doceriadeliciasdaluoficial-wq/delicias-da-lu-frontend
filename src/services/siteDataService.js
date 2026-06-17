@@ -1,52 +1,37 @@
-import defaultSiteConfig, { cloneSiteConfig } from '../data/defaultSiteConfig'
-
-const LOCAL_STORAGE_KEY = 'delicias.site.config.v1'
+import menuService from './menuService'
+import cakeBuilderService from './cakeBuilderService'
+import contactService from './contactService'
 
 export const siteDataService = {
-  getDefaultConfig() {
-    return cloneSiteConfig(defaultSiteConfig)
-  },
-
-  loadConfig() {
+  async loadConfig() {
     try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
-      if (!raw) return this.getDefaultConfig()
+      const [menuData, cakeBuilderData, contactsData] = await Promise.all([
+        menuService.getAll(),
+        cakeBuilderService.getAll(),
+        contactService.getContacts()
+      ])
 
-      const parsed = JSON.parse(raw)
       return {
-        ...this.getDefaultConfig(),
-        ...parsed,
-        cakeBuilder: {
-          ...this.getDefaultConfig().cakeBuilder,
-          ...(parsed.cakeBuilder || {})
-        },
-        menu: {
-          ...this.getDefaultConfig().menu,
-          ...(parsed.menu || {}),
+        menu: Array.isArray(menuData) ? { 
+          bolos: menuData.filter(item => item.category === 'Bolos'),
+          docesSimples: menuData.filter(item => item.category === 'Doces Simples'),
+          docesFinos: menuData.filter(item => item.category === 'Doces Finos'),
+          decoracoes: menuData.filter(item => item.category === 'Decorações'),
           sectionLabels: {
-            ...this.getDefaultConfig().menu.sectionLabels,
-            ...(parsed.menu?.sectionLabels || {})
+            bolos: '🍰 Bolos',
+            docesSimples: '🍫 Doces Simples',
+            docesFinos: '✨ Doces Finos',
+            decoracoes: '🎀 Decorações'
           },
-          customSections: parsed?.menu?.customSections || []
-        },
-        contacts: {
-          ...this.getDefaultConfig().contacts,
-          ...(parsed.contacts || {})
-        }
+          customSections: []
+        } : { bolos: [], docesSimples: [], docesFinos: [], decoracoes: [] },
+        cakeBuilder: cakeBuilderData || { massas: [], recheios: [], coberturas: [], decoracoes: [] },
+        contacts: contactsData || { whatsapp: { number: '', link: '' }, email: '', instagram: '' }
       }
     } catch (error) {
-      console.warn('Erro ao carregar configurações locais. Restaurando padrão.', error)
-      return this.getDefaultConfig()
+      console.error('Erro ao carregar configurações do servidor:', error)
+      throw error
     }
-  },
-
-  saveConfig(config) {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config))
-  },
-
-  resetConfig() {
-    localStorage.removeItem(LOCAL_STORAGE_KEY)
-    return this.getDefaultConfig()
   }
 }
 
