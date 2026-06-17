@@ -39,10 +39,12 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('[API Response]', {
+    console.log('[API Response Success]', {
       status: response.status,
       url: response.config?.url,
-      method: response.config?.method?.toUpperCase()
+      method: response.config?.method?.toUpperCase(),
+      dataKeys: Object.keys(response.data || {}),
+      dataStructure: JSON.stringify(response.data).substring(0, 100) + '...'
     })
     return response.data
   },
@@ -53,7 +55,9 @@ apiClient.interceptors.response.use(
       url: error.config?.url,
       method: error.config?.method?.toUpperCase(),
       message: error.message,
-      data: error.response?.data
+      errorData: error.response?.data,
+      errorMessage: error.message,
+      isNetworkError: !error.response
     })
     
     if (error.response?.status === 401) {

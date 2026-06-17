@@ -12,11 +12,30 @@ export function AdminAuthProvider({ children }) {
     try {
       setIsLoading(true)
       setError(null)
+      console.log('[AdminAuthContext] Attempting login for:', username)
+      
       await authService.login(username, password)
-      setIsAuthenticated(true)
+      
+      console.log('[AdminAuthContext] Login successful, checking authenticated status')
+      const isAuth = authService.isAuthenticated()
+      console.log('[AdminAuthContext] isAuthenticated result:', isAuth)
+      
+      setIsAuthenticated(isAuth)
+      console.log('[AdminAuthContext] ✅ Authentication state updated to true')
       return true
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao fazer login')
+      console.error('[AdminAuthContext] ❌ Login error caught:', {
+        errorMessage: err.message,
+        errorResponse: err.response?.data?.message || err.response?.data,
+        errorStatus: err.response?.status
+      })
+      
+      const errorMessage = err.response?.data?.detail || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Erro ao fazer login'
+      
+      setError(errorMessage)
       setIsAuthenticated(false)
       return false
     } finally {
