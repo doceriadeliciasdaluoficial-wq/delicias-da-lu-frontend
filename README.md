@@ -24,7 +24,7 @@ npm run build
 
 ```
 src/
-├── config/                 # Configurações centralizadas (IMPORTANTE!)
+├── config/                # Configurações centralizadas (IMPORTANTE!)
 │   ├── contacts.js        # WhatsApp, email, localização
 │   ├── menu.js            # Todos os produtos
 │   ├── cakeBuilder.js     # Opções do Cake Builder
@@ -58,7 +58,7 @@ Para alterar qualquer coisa, edite esses arquivos!
 
 ## 📞 Contatos
 
-- **WhatsApp**: +55 (11) 945-7541-50
+- **WhatsApp**: +55 (11) 94575-4150
 - **Email**: gab.ponsoni@gmail.com
 - **Instagram**: @deliciasda.lu.oficial
 
@@ -68,6 +68,3 @@ Para alterar qualquer coisa, edite esses arquivos!
 2. Upload de `dist/` para Vercel, Netlify ou seu servidor
 
 ---
-
-**Versão**: 1.0  
-**Desenvolvido por**: GitHub Copilot CLI

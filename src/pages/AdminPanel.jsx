@@ -193,23 +193,52 @@ function normalizeSiteOrders(config) {
 }
 
 function formatBrazilianPhone(value) {
-  const digits = String(value || '').replace(/\D/g, '')
+  let digits = String(value || '').replace(/\D/g, '')
   if (!digits) return ''
 
-  const hasCountryCode = digits.startsWith('55') && digits.length > 11
-  const localDigits = hasCountryCode ? digits.slice(2) : digits
-  const ddd = localDigits.slice(0, 2)
-  const subscriber = localDigits.slice(2)
-
-  if (subscriber.length <= 4) {
-    return hasCountryCode ? `+55 (${ddd}) ${subscriber}`.trim() : `(${ddd}) ${subscriber}`.trim()
+  // Remove código do país se presente
+  if (digits.startsWith('55')) {
+    digits = digits.slice(2)
   }
 
-  const firstPart = subscriber.length === 8 ? subscriber.slice(0, 4) : subscriber.slice(0, 5)
-  const secondPart = subscriber.length === 8 ? subscriber.slice(4, 8) : subscriber.slice(5, 9)
-  const formatted = `(${ddd}) ${firstPart}-${secondPart}`.trim()
+  // Valida e formata
+  if (digits.length < 10) return digits // Número incompleto
 
-  return hasCountryCode ? `+55 ${formatted}` : formatted
+  // Se tem 10 dígitos (fixo), formata como (XX) XXXX-XXXX
+  if (digits.length === 10) {
+    const ddd = digits.slice(0, 2)
+    const subscriber = digits.slice(2)
+    return `(${ddd}) ${subscriber.slice(0, 4)}-${subscriber.slice(4, 8)}`
+  }
+
+  // Se tem 11 dígitos (celular), formata como (XX) XXXXX-XXXX
+  if (digits.length === 11) {
+    const ddd = digits.slice(0, 2)
+    const subscriber = digits.slice(2)
+    return `(${ddd}) ${subscriber.slice(0, 5)}-${subscriber.slice(5, 9)}`
+  }
+
+  // Se tem mais de 11 dígitos (com código do país), formata com +55
+  if (digits.length > 11) {
+    // Trata como se tivesse código do país
+    const fullDigits = value.replace(/\D/g, '')
+    const hasFiftyFive = fullDigits.startsWith('55')
+    const localDigits = hasFiftyFive ? fullDigits.slice(2) : fullDigits
+    
+    if (localDigits.length === 10) {
+      const ddd = localDigits.slice(0, 2)
+      const subscriber = localDigits.slice(2)
+      return `+55 (${ddd}) ${subscriber.slice(0, 4)}-${subscriber.slice(4, 8)}`
+    }
+    
+    if (localDigits.length === 11) {
+      const ddd = localDigits.slice(0, 2)
+      const subscriber = localDigits.slice(2)
+      return `+55 (${ddd}) ${subscriber.slice(0, 5)}-${subscriber.slice(5, 9)}`
+    }
+  }
+
+  return digits
 }
 
 function sanitizeBrazilianPhoneInput(value) {

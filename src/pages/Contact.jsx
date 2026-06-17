@@ -1,6 +1,59 @@
 import React, { useState } from 'react'
 import { useSiteData } from '../context/SiteDataContext'
 
+function formatBrazilianPhone(value) {
+  let digits = String(value || '').replace(/\D/g, '')
+  if (!digits) return ''
+
+  // Remove código do país se presente
+  if (digits.startsWith('55')) {
+    digits = digits.slice(2)
+  }
+
+  // Valida e formata
+  if (digits.length < 10) return digits // Número incompleto
+
+  // Se tem 10 dígitos (fixo), formata como (XX) XXXX-XXXX
+  if (digits.length === 10) {
+    const ddd = digits.slice(0, 2)
+    const subscriber = digits.slice(2)
+    return `(${ddd}) ${subscriber.slice(0, 4)}-${subscriber.slice(4, 8)}`
+  }
+
+  // Se tem 11 dígitos (celular), formata como (XX) XXXXX-XXXX
+  if (digits.length === 11) {
+    const ddd = digits.slice(0, 2)
+    const subscriber = digits.slice(2)
+    return `(${ddd}) ${subscriber.slice(0, 5)}-${subscriber.slice(5, 9)}`
+  }
+
+  // Se tem mais de 11 dígitos (com código do país), formata com +55
+  if (digits.length > 11) {
+    // Trata como se tivesse código do país
+    const fullDigits = value.replace(/\D/g, '')
+    const hasFiftyFive = fullDigits.startsWith('55')
+    const localDigits = hasFiftyFive ? fullDigits.slice(2) : fullDigits
+    
+    if (localDigits.length === 10) {
+      const ddd = localDigits.slice(0, 2)
+      const subscriber = localDigits.slice(2)
+      return `+55 (${ddd}) ${subscriber.slice(0, 4)}-${subscriber.slice(4, 8)}`
+    }
+    
+    if (localDigits.length === 11) {
+      const ddd = localDigits.slice(0, 2)
+      const subscriber = localDigits.slice(2)
+      return `+55 (${ddd}) ${subscriber.slice(0, 5)}-${subscriber.slice(5, 9)}`
+    }
+  }
+
+  return digits
+}
+
+function sanitizeBrazilianPhoneInput(value) {
+  return String(value || '').replace(/\D/g, '')
+}
+
 export default function Contact({ setCurrentPage }) {
   const { contacts } = useSiteData()
   const [formData, setFormData] = useState({
@@ -12,7 +65,11 @@ export default function Contact({ setCurrentPage }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    if (name === 'phone') {
+      setFormData(prev => ({ ...prev, [name]: sanitizeBrazilianPhoneInput(value) }))
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleSubmit = (e) => {
@@ -142,7 +199,7 @@ export default function Contact({ setCurrentPage }) {
               <input
                 type="tel"
                 name="phone"
-                value={formData.phone}
+                value={formatBrazilianPhone(formData.phone)}
                 onChange={handleChange}
                 placeholder="(XX) XXXXX-XXXX"
                 className="w-full px-4 py-3 border border-outline-variant rounded-lg bg-surface-container-lowest font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary"
